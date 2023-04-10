@@ -34,7 +34,7 @@ The RPI firmware is not compatible with the CM4. Therfore it has to be updated:
 +SRC_URI[sha256sum] = "d71b4a941b297b1327564dd22a9bf70bee885a38e206c54cebec91b4824e21d8"
 ```
 
-1. Include the CM4 device tree
+2. Include the CM4 device tree
 
 The local.conf file of the Yocto build has to be adapted:
 
@@ -44,7 +44,7 @@ RPI_KERNEL_DEVICETREE_remove = "broadcom/bcm2711-rpi-400.dtb broadcom/bcm2711-rp
 
 Remove broadcom/bcm2711-rpi-cm4.dtb
 
-1. Enable USB host
+3. Enable USB host
 
 On the compute module USB host is disabled by default.
 
@@ -52,6 +52,29 @@ Add the following line to config.txt to enable it.
 
 ```
 dtoverlay=dwc2,dr_mode=host
+```
+
+Enable HiFi Berry
+
+```
+sudo elk_system_utils --set-audio-hat hifiberry-dac-plus-adc-pro
+```
+
+Connect to WLAN
+
+```
+$ sudo connmanctl
+# Now you should see a connmanctl shell where to type these extra commands:
+$ connmanctl> agent on
+$ connmanctl> scan wifi
+$ connmanctl> services
+# The last command should have showed you a list of WiFi network available with their SSID and a
+# long code starting with wifi_
+$ connmanctl> connect wifi_xxx # choose the code for the desired network. You can tab-complete.
+$ connmanctl> Ctrl+D
+
+# This will show you the IP address assigned to the board by DHCP
+$ ip a
 ```
 
 ## Backup on OSX
