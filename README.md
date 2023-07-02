@@ -40,6 +40,16 @@ ssh mind@pedalboard
 
 4. Install pedalboard software
 
+Midi
+```
+sudo mkdir /mnt/pico
+cd /udata
+git clone https://github.com/pedalboard/pedalboard-midi.git
+cd pedalboard-midi
+```
+
+
+Audio
 ```
 cd /udata
 git clone https://github.com/pedalboard/pedalboard-audio.git
@@ -49,6 +59,8 @@ make install
 make restart
 make status
 ```
+
+
 
 
 
