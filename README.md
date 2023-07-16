@@ -48,7 +48,6 @@ git clone https://github.com/pedalboard/pedalboard-midi.git
 cd pedalboard-midi
 ```
 
-
 Audio
 ```
 cd /udata
@@ -60,9 +59,15 @@ make restart
 make status
 ```
 
-
-
-
+Midi Bridge
+```
+cd /udata
+git clone https://github.com/pedalboard/sushi-osc-midi-bridge.git
+cd sushi-osc-midi-bridge
+make install
+make start
+make status
+```
 
 ## Backup on OSX
 
