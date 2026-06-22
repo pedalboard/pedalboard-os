@@ -69,6 +69,17 @@ make start
 make status
 ```
 
+OpenDeck Config UI
+```
+cd /udata
+git clone https://github.com/pedalboard/opendeck-bridge.git
+cd opendeck-bridge
+sudo cp opendeck-bridge.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now opendeck-bridge
+sudo systemctl status opendeck-bridge
+```
+
 ## Backup on OSX
 
 1. run [usbbot](https://github.com/raspberrypi/usbboot)
