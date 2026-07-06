@@ -8,4 +8,4 @@ AUDIO_CARD=3
 MIDI_PORT=OpenDeck
 
 # Bridge HTTP/WebSocket port
-BRIDGE_PORT=8080
+BRIDGE_PORT=80
