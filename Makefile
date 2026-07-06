@@ -2,12 +2,13 @@
 
 .DEFAULT_GOAL := help
 
-SERVICES = pedalboard-jack pedalboard-bridge
+SERVICES = pedalboard-jack pedalboard-modhost pedalboard-bridge
 CONFIG_DIR = /etc/pedalboard
 
 install: ## Install services and configuration
 	@echo "Installing pedalboard services..."
 	sudo cp pedalboard-jack.service /etc/systemd/system/
+	sudo cp pedalboard-modhost.service /etc/systemd/system/
 	sudo cp pedalboard-bridge.service /etc/systemd/system/
 	sudo mkdir -p $(CONFIG_DIR)/models
 	sudo cp env $(CONFIG_DIR)/env

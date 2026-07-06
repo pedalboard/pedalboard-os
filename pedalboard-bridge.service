@@ -1,7 +1,7 @@
 [Unit]
 Description=Pedalboard Bridge (MIDI + Audio Switching)
-After=pedalboard-jack.service
-Requires=pedalboard-jack.service
+After=pedalboard-modhost.service
+Requires=pedalboard-jack.service pedalboard-modhost.service
 
 [Service]
 Type=simple
