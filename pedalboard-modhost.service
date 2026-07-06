@@ -5,7 +5,7 @@ Requires=pedalboard-jack.service
 
 [Service]
 Type=simple
-EnvironmentFile=/etc/pedalboard/env
+User=laenzi
 ExecStart=/usr/local/bin/mod-host -n -p 5555
 Restart=always
 RestartSec=2

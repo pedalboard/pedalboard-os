@@ -4,6 +4,7 @@ After=sound.target
 
 [Service]
 Type=simple
+User=laenzi
 EnvironmentFile=/etc/pedalboard/env
 Environment=JACK_NO_AUDIO_RESERVATION=1
 ExecStartPre=/bin/sh -c '/usr/bin/amixer -c $AUDIO_CARD set "Auto Mute" off'

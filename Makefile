@@ -6,10 +6,10 @@ SERVICES = pedalboard-jack pedalboard-modhost pedalboard-bridge
 CONFIG_DIR = /etc/pedalboard
 
 install: ## Install services and configuration
-	@echo "Installing pedalboard services..."
-	sudo cp pedalboard-jack.service /etc/systemd/system/
-	sudo cp pedalboard-modhost.service /etc/systemd/system/
-	sudo cp pedalboard-bridge.service /etc/systemd/system/
+	@echo "Installing pedalboard services for user $(USER)..."
+	sed 's/User=laenzi/User=$(USER)/' pedalboard-jack.service | sudo tee /etc/systemd/system/pedalboard-jack.service >/dev/null
+	sed 's/User=laenzi/User=$(USER)/' pedalboard-modhost.service | sudo tee /etc/systemd/system/pedalboard-modhost.service >/dev/null
+	sed 's/User=laenzi/User=$(USER)/' pedalboard-bridge.service | sudo tee /etc/systemd/system/pedalboard-bridge.service >/dev/null
 	sudo mkdir -p $(CONFIG_DIR)/models
 	sudo cp env $(CONFIG_DIR)/env
 	@if [ ! -f $(CONFIG_DIR)/audio-patches.json ]; then \
