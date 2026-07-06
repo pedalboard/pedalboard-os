@@ -5,9 +5,10 @@ After=sound.target
 [Service]
 Type=simple
 EnvironmentFile=/etc/pedalboard/env
-ExecStartPre=/usr/bin/amixer -c ${AUDIO_CARD} set "Auto Mute" off
-ExecStartPre=/usr/bin/amixer -c ${AUDIO_CARD} set "Auto Mute Mono" off
-ExecStart=/usr/bin/jackd -d alsa -d hw:${AUDIO_CARD} -r 48000 -p 64 -n 2 -i 2 -o 2
+Environment=JACK_NO_AUDIO_RESERVATION=1
+ExecStartPre=/bin/sh -c '/usr/bin/amixer -c $AUDIO_CARD set "Auto Mute" off'
+ExecStartPre=/bin/sh -c '/usr/bin/amixer -c $AUDIO_CARD set "Auto Mute Mono" off'
+ExecStart=/bin/sh -c 'exec /usr/bin/jackd -d alsa -d hw:$AUDIO_CARD -r 48000 -p 64 -n 2 -i 2 -o 2'
 Restart=always
 RestartSec=2
 

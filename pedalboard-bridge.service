@@ -6,7 +6,7 @@ Requires=pedalboard-jack.service pedalboard-modhost.service
 [Service]
 Type=simple
 EnvironmentFile=/etc/pedalboard/env
-ExecStart=/usr/local/bin/pedalboard-bridge -port ${MIDI_PORT} -addr :${BRIDGE_PORT} -audio /etc/pedalboard/audio-patches.json
+ExecStart=/bin/sh -c 'exec /usr/local/bin/pedalboard-bridge -port $MIDI_PORT -addr :$BRIDGE_PORT -audio /etc/pedalboard/audio-patches.json'
 Restart=always
 RestartSec=2
 
