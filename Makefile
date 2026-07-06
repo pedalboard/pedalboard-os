@@ -1,13 +1,38 @@
-.PHONY: help downlaod
+.PHONY: install uninstall enable disable status help
 
 .DEFAULT_GOAL := help
 
-download: ## download the image from the build server
-	mkdir -p images
-	rsync -P -avh christof@yocto-build:/home/christof/pedalboard-os/yocto/build/tmp/deploy/images/raspberrypi4-64/*.wic.bz2 images/
+SERVICES = pedalboard-jack pedalboard-bridge
+CONFIG_DIR = /etc/pedalboard
+
+install: ## Install services and configuration
+	@echo "Installing pedalboard services..."
+	sudo cp pedalboard-jack.service /etc/systemd/system/
+	sudo cp pedalboard-bridge.service /etc/systemd/system/
+	sudo mkdir -p $(CONFIG_DIR)/models
+	sudo cp env $(CONFIG_DIR)/env
+	@if [ ! -f $(CONFIG_DIR)/audio-patches.json ]; then \
+		sudo cp audio-patches.json $(CONFIG_DIR)/audio-patches.json; \
+	else \
+		echo "$(CONFIG_DIR)/audio-patches.json already exists, skipping"; \
+	fi
+	sudo systemctl daemon-reload
+	@echo "Done. Run 'make enable' to start on boot."
+
+uninstall: disable ## Remove services and configuration
+	sudo rm -f /etc/systemd/system/pedalboard-jack.service
+	sudo rm -f /etc/systemd/system/pedalboard-bridge.service
+	sudo systemctl daemon-reload
+	@echo "Services removed. Config left in $(CONFIG_DIR)."
+
+enable: ## Enable and start services
+	sudo systemctl enable --now $(addsuffix .service,$(SERVICES))
+
+disable: ## Stop and disable services
+	sudo systemctl disable --now $(addsuffix .service,$(SERVICES))
+
+status: ## Show service status
+	@systemctl status $(addsuffix .service,$(SERVICES)) --no-pager || true
 
 help:
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
-
-
-
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'

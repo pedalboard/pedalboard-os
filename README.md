@@ -1,90 +1,58 @@
 # Pedalboard OS
 
-Low latency Audio Operating system based on the open source ELK Audio OS.
+System configuration for the Open Pedalboard audio+MIDI platform running on Raspberry Pi CM5.
 
-## Hardware
-* Raspberry Pi Compute Module 4, 4 GB RAM, 32GB eMMC, Wireless
-* Waveshare [CM4 Nano A](https://www.waveshare.com/wiki/CM4-NANO-A)
-* [HiFiBerry DAC+ADC](https://www.hifiberry.com/shop/boards/hifiberry-dac-adc-pro/)
+**Stack:** Debian Bookworm + JACK + AIDA-X + mod-host + pedalboard-bridge
+
+## Prerequisites
+
+- Raspberry Pi CM5 with Debian Bookworm
+- Pedalboard soundcard (PCM1863 ADC + PCM5242 DAC) connected via I2S
+- Pedalboard MIDI controller (RP2040) connected via USB
+
+## Install
+
+```bash
+git clone https://github.com/pedalboard/pedalboard-os.git
+cd pedalboard-os
+make install
+sudo reboot
+```
+
+## Services
+
+| Service | Description |
+|---------|-------------|
+| `pedalboard-jack` | JACK audio server (hw:3, 48kHz, 64 frames, 2ch) |
+| `pedalboard-bridge` | WebSocket↔MIDI bridge + mod-host audio switching |
 
 ## Configuration
 
-The Pedalboard OS is based on [Elk Audio OS](https://elk-audio.github.io/elk-docs/html/index.html).
-
-Since v1.0.0 RPI CM4 is supported natively.
-
-1. Enable USB host
-
-On the compute module USB host is disabled by default.
-
-Add the following line to config.txt to enable it.
-
 ```
-dtoverlay=dwc2,dr_mode=host
+/etc/pedalboard/
+├── audio-patches.json    # Audio plugin chain per preset
+└── models/               # AIDA-X model state directories
+    └── default/
+        ├── state.ttl
+        └── model.aidax
 ```
 
-2. Enable WiFi
+## Manual Testing
 
-- boot the board connected to LAN and ssh into it with `ssh mind@elk-pi`
-- follow https://elk-audio.github.io/elk-docs/html/embedded/working_with_elk_board.html#over-wifi
+```bash
+# Check services
+systemctl status pedalboard-jack pedalboard-bridge
 
+# Test audio output
+speaker-test -D hw:3 -c 2 -t sine -f 440 -s 2
 
-3. Change hostname
+# Direct loopback (guitar test)
+jack_connect system:capture_2 system:playback_2
 
-```
-sudo echo pedalboard > /etc/hostname
-sudo reboot
-ssh-copy-id mind@pedalboard
-ssh mind@pedalboard
-```
-
-4. Install pedalboard software
-
-Midi
-```
-sudo mkdir /mnt/pico
-cd /udata
-git clone https://github.com/pedalboard/pedalboard-midi.git
-cd pedalboard-midi
+# Check JACK
+jack_lsp -c
 ```
 
-Audio
-```
-cd /udata
-git clone https://github.com/pedalboard/pedalboard-audio.git
-cd pedalboard-audio
-make install-plugins
-make install
-make restart
-make status
-```
+## License
 
-Midi Bridge
-```
-cd /udata
-git clone https://github.com/pedalboard/sushi-osc-midi-bridge.git
-cd sushi-osc-midi-bridge
-make install
-make start
-make status
-```
-
-OpenDeck Config UI
-```
-cd /udata
-git clone https://github.com/pedalboard/opendeck-bridge.git
-cd opendeck-bridge
-sudo cp opendeck-bridge.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now opendeck-bridge
-sudo systemctl status opendeck-bridge
-```
-
-## Backup on OSX
-
-1. run [usbbot](https://github.com/raspberrypi/usbboot)
-2. find disk `diskutil list`
-3. copy `sudo dd if=/dev/diskX of=backup/pedalboard-audio-20230129.dmg`
-4. shrink the image with [pyshrink](https://github.com/lisanet/PiShrink-macOS)
-
-
+[GPL-3.0](LICENSE)

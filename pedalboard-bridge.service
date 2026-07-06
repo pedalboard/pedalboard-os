@@ -1,0 +1,14 @@
+[Unit]
+Description=Pedalboard Bridge (MIDI + Audio Switching)
+After=pedalboard-jack.service
+Requires=pedalboard-jack.service
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/pedalboard/env
+ExecStart=/usr/local/bin/pedalboard-bridge -port ${MIDI_PORT} -addr :${BRIDGE_PORT} -audio /etc/pedalboard/audio-patches.json
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,36 @@
+{
+  "capture_port": "system:capture_2",
+  "playback_port": "system:playback_2",
+  "patches": [
+    {
+      "name": "Clean",
+      "plugins": [
+        { "uri": "http://aidadsp.cc/plugins/aidadsp-bundle/rt-neural-loader", "id": 0 }
+      ],
+      "params": [
+        { "instance": 0, "param": "PREGAIN", "value": 0.3 },
+        { "instance": 0, "param": "MASTER", "value": 0.7 }
+      ]
+    },
+    {
+      "name": "Crunch",
+      "plugins": [
+        { "uri": "http://aidadsp.cc/plugins/aidadsp-bundle/rt-neural-loader", "id": 0 }
+      ],
+      "params": [
+        { "instance": 0, "param": "PREGAIN", "value": 0.7 },
+        { "instance": 0, "param": "MASTER", "value": 0.6 }
+      ]
+    },
+    {
+      "name": "High Gain",
+      "plugins": [
+        { "uri": "http://aidadsp.cc/plugins/aidadsp-bundle/rt-neural-loader", "id": 0 }
+      ],
+      "params": [
+        { "instance": 0, "param": "PREGAIN", "value": 1.0 },
+        { "instance": 0, "param": "MASTER", "value": 0.5 }
+      ]
+    }
+  ]
+}
