@@ -1,0 +1,17 @@
+[Unit]
+Description=Pedalboard MOD UI (Audio Plugin Editor)
+After=pedalboard-modhost.service
+
+[Service]
+Type=simple
+User=laenzi
+Environment=MOD_DEV_ENVIRONMENT=1
+Environment=MOD_HOST_PORT=5555
+Environment=MOD_DATA_DIR=/opt/mod-ui/data
+WorkingDirectory=/opt/mod-ui
+ExecStart=/usr/bin/python3 server.py
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
