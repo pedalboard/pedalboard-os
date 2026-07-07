@@ -7,13 +7,23 @@ CONFIG_DIR = /etc/pedalboard
 
 deps: ## Install all audio dependencies (JACK, mod-host, plugins, AIDA-X)
 	sudo apt-get update -qq
-	sudo apt-get install -y -qq jackd2 liblilv-dev libreadline-dev libfftw3-dev libjack-jackd2-dev lilv-utils calf-plugins x42-plugins
+	sudo apt-get install -y -qq jackd2 liblilv-dev libreadline-dev libfftw3-dev libjack-jackd2-dev lilv-utils
+	@echo "Installing LV2 plugins (curated for guitar pedalboard)..."
+	sudo apt-get install -y -qq calf-plugins guitarix-lv2 x42-plugins
 	@echo "Building mod-host from source..."
 	cd /tmp && rm -rf mod-host && git clone https://github.com/mod-audio/mod-host.git && cd mod-host && make -j4 && sudo make install
 	@echo "Building AIDA-X from source..."
 	cd /tmp && rm -rf AIDA-X && git clone --recursive https://github.com/AidaDSP/AIDA-X.git && cd AIDA-X && cmake -B build -DCMAKE_BUILD_TYPE=Release && cd build && make -j4
 	sudo cp -r /tmp/AIDA-X/build/bin/AIDA-X.lv2 /usr/lib/lv2/
 	@echo "All dependencies installed."
+	@echo ""
+	@echo "Recommended plugins for guitar pedalboard:"
+	@echo "  Amp:    AIDA-X (neural amp modeler)"
+	@echo "  Drive:  GxTubeScreamer, GxBigMuffPi, GxRat"
+	@echo "  Delay:  Calf Vintage Delay, Calf Reverse Delay"
+	@echo "  Reverb: Calf Reverb, GxMultiBandReverb"
+	@echo "  Mod:    Calf Flanger, GxChorus-Stereo, GxTremolo"
+	@echo "  Util:   Calf Compressor, x42 Instrument Tuner"
 
 install: ## Install services and configuration
 	@echo "Installing pedalboard services for user $(USER)..."
@@ -25,6 +35,9 @@ install: ## Install services and configuration
 	sudo cp env $(CONFIG_DIR)/env
 	sudo cp mod-hardware-descriptor.json /etc/mod-hardware-descriptor.json
 	sudo cp models/*.json $(CONFIG_DIR)/models/
+	@if [ ! -f /opt/mod-ui/data/favorites.json ] || [ "$$(cat /opt/mod-ui/data/favorites.json)" = "[]" ]; then \
+		sudo cp mod-favorites.json /opt/mod-ui/data/favorites.json; \
+	fi
 	@if [ ! -f $(CONFIG_DIR)/audio-patches.json ]; then \
 		sudo cp audio-patches.json $(CONFIG_DIR)/audio-patches.json; \
 	else \

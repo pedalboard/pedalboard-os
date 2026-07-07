@@ -1,0 +1,15 @@
+[
+  "http://aidadsp.cc/plugins/aidadsp-bundle/rt-neural-loader",
+  "http://guitarix.sourceforge.net/plugins/gxts9#ts9sim",
+  "http://guitarix.sourceforge.net/plugins/gx_bmp_#_bmp_",
+  "http://guitarix.sourceforge.net/plugins/gx_aclipper_#_aclipper_",
+  "http://calf.sourceforge.net/plugins/Compressor",
+  "http://calf.sourceforge.net/plugins/Reverb",
+  "http://calf.sourceforge.net/plugins/VintageDelay",
+  "http://calf.sourceforge.net/plugins/ReverseDelay",
+  "http://calf.sourceforge.net/plugins/Flanger",
+  "http://guitarix.sourceforge.net/plugins/gx_chorus_stereo#_chorus_stereo",
+  "http://guitarix.sourceforge.net/plugins/gx_tremolo#_tremolo",
+  "http://guitarix.sourceforge.net/plugins/gx_mbreverb_#_mbreverb_",
+  "http://gareus.org/oss/lv2/tuna#one"
+]
