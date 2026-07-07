@@ -5,7 +5,9 @@ After=pedalboard-modhost.service
 [Service]
 Type=simple
 User=laenzi
-Environment=MOD_DEV_ENVIRONMENT=1
+Environment=MOD_DEV_ENVIRONMENT=0
+Environment=MOD_DEV_HMI=1
+Environment=MOD_DEV_HOST=0
 Environment=MOD_HOST_PORT=5555
 Environment=MOD_DATA_DIR=/opt/mod-ui/data
 WorkingDirectory=/opt/mod-ui
