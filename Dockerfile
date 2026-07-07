@@ -16,6 +16,7 @@ WORKDIR /opt/pedalboard-os
 COPY . .
 
 # Use our own Makefile for everything
+RUN echo "jackd2 jackd/tweak_rt_limits boolean true" | debconf-set-selections
 RUN make deps
 RUN make install
 
