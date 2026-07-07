@@ -5,7 +5,7 @@ echo "Starting pedalboard test environment..."
 
 # Install favorites if empty
 if [ ! -f /opt/mod-ui/data/favorites.json ] || [ "$(cat /opt/mod-ui/data/favorites.json)" = "[]" ]; then
-    cp /opt/pedalboard-os/mod-favorites.json /opt/mod-ui/data/favorites.json 2>/dev/null || true
+    cp /opt/pedalboard-os/mod-favorites.json /opt/mod-ui/data/favorites.json
 fi
 
 # Start JACK with dummy driver (no real audio hardware)

@@ -23,6 +23,8 @@ RUN make install
 # Fix MOD UI data permissions for non-root user
 RUN mkdir -p /opt/mod-ui/data && chown -R pedalboard:pedalboard /opt/mod-ui/data
 RUN mkdir -p /home/pedalboard/.pedalboards && chown -R pedalboard:pedalboard /home/pedalboard/.pedalboards
+COPY mod-favorites.json /opt/mod-ui/data/favorites.json
+RUN chown pedalboard:pedalboard /opt/mod-ui/data/favorites.json
 
 COPY docker-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
