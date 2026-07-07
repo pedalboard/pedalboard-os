@@ -11,8 +11,7 @@ deps: ## Install all audio dependencies (JACK, mod-host, plugins, AIDA-X)
 	@echo "Installing LV2 plugins (curated for guitar pedalboard)..."
 	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq calf-plugins guitarix-lv2 x42-plugins
 	@echo "Installing MOD UI dependencies..."
-	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3 python3-pip python3-pil python3-numpy
-	sudo pip3 install 'tornado>=4.3,<5'
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3 python3-pip python3-pil python3-numpy python3-tornado
 	@echo "Building mod-host from source..."
 	cd /tmp && rm -rf mod-host && git clone https://github.com/mod-audio/mod-host.git && cd mod-host && make -j$$(nproc) && sudo make install
 	@echo "Building AIDA-X (headless LV2) from source..."
@@ -23,6 +22,8 @@ deps: ## Install all audio dependencies (JACK, mod-host, plugins, AIDA-X)
 	@if [ ! -d /opt/mod-ui ]; then \
 		sudo git clone --depth 1 https://github.com/mod-audio/mod-ui.git /opt/mod-ui; \
 	fi
+	@echo "Patching MOD UI for Tornado 6 compatibility..."
+	sudo sed -i 's/@web.asynchronous//' /opt/mod-ui/mod/webserver.py
 	cd /opt/mod-ui/utils && make
 	@echo "All dependencies installed."
 	@echo ""
