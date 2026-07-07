@@ -1,0 +1,12 @@
+{
+  "name": "Pedalboard",
+  "platform": "pedalboard-cm5",
+  "model": "pedalboard",
+  "architecture": "aarch64",
+  "cpu": "Cortex-A76",
+  "swapped_audio_channels": false,
+  "has_noisegate": false,
+  "codec_truebypass": false,
+  "tuner_resolution": 1,
+  "factory_pedalboards": false
+}

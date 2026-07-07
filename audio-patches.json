@@ -3,9 +3,10 @@
   "playback_port": "system:playback_2",
   "patches": [
     {
-      "name": "Clean",
+      "name": "Clean + Reverb",
       "plugins": [
-        { "uri": "http://aidadsp.cc/plugins/aidadsp-bundle/rt-neural-loader", "id": 0 }
+        { "uri": "http://aidadsp.cc/plugins/aidadsp-bundle/rt-neural-loader", "id": 0 },
+        { "uri": "http://calf.sourceforge.net/plugins/Reverb", "id": 1, "input": "in_l", "output": "out_l" }
       ],
       "params": [
         { "instance": 0, "param": "PREGAIN", "value": 0.3 },
@@ -13,9 +14,10 @@
       ]
     },
     {
-      "name": "Crunch",
+      "name": "Crunch + Delay",
       "plugins": [
-        { "uri": "http://aidadsp.cc/plugins/aidadsp-bundle/rt-neural-loader", "id": 0 }
+        { "uri": "http://aidadsp.cc/plugins/aidadsp-bundle/rt-neural-loader", "id": 0 },
+        { "uri": "http://calf.sourceforge.net/plugins/VintageDelay", "id": 1, "input": "in_l", "output": "out_l" }
       ],
       "params": [
         { "instance": 0, "param": "PREGAIN", "value": 0.7 },
@@ -23,9 +25,10 @@
       ]
     },
     {
-      "name": "High Gain",
+      "name": "High Gain + Flanger",
       "plugins": [
-        { "uri": "http://aidadsp.cc/plugins/aidadsp-bundle/rt-neural-loader", "id": 0 }
+        { "uri": "http://aidadsp.cc/plugins/aidadsp-bundle/rt-neural-loader", "id": 0 },
+        { "uri": "http://calf.sourceforge.net/plugins/Flanger", "id": 1, "input": "in_l", "output": "out_l" }
       ],
       "params": [
         { "instance": 0, "param": "PREGAIN", "value": 1.0 },
