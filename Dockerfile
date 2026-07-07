@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim
+FROM debian:bullseye-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential cmake git \
@@ -16,6 +16,9 @@ COPY . .
 # Use our own Makefile for everything
 RUN make deps
 RUN make install
+
+# Fix MOD UI data permissions for non-root user
+RUN mkdir -p /opt/mod-ui/data && chown -R pedalboard:pedalboard /opt/mod-ui/data
 
 COPY docker-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
