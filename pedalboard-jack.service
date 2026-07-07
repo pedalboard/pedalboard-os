@@ -10,6 +10,19 @@ Environment=JACK_NO_AUDIO_RESERVATION=1
 ExecStartPre=/bin/sh -c '/usr/bin/amixer -c $AUDIO_CARD set "Auto Mute" off'
 ExecStartPre=/bin/sh -c '/usr/bin/amixer -c $AUDIO_CARD set "Auto Mute Mono" off'
 ExecStart=/bin/sh -c 'exec /usr/bin/jackd -d alsa -d hw:$AUDIO_CARD -r 48000 -p 64 -n 2 -i 2 -o 2'
+ExecStartPost=/bin/sh -c 'sleep 0.5 && \
+  jack_property -p -s system:capture_1 http://jackaudio.org/metadata/pretty-name "IN L" && \
+  jack_property -p -s system:capture_2 http://jackaudio.org/metadata/pretty-name "IN R" && \
+  jack_property -p -s system:playback_1 http://jackaudio.org/metadata/pretty-name "OUT L" && \
+  jack_property -p -s system:playback_2 http://jackaudio.org/metadata/pretty-name "OUT R" && \
+  jack_alias -u system:capture_1 "alsa_pcm:hw:${AUDIO_CARD}:out1" && \
+  jack_alias -u system:capture_2 "alsa_pcm:hw:${AUDIO_CARD}:out2" && \
+  jack_alias -u system:playback_1 "alsa_pcm:hw:${AUDIO_CARD}:in1" && \
+  jack_alias -u system:playback_2 "alsa_pcm:hw:${AUDIO_CARD}:in2" && \
+  jack_alias system:capture_1 "IN L" && \
+  jack_alias system:capture_2 "IN R" && \
+  jack_alias system:playback_1 "OUT L" && \
+  jack_alias system:playback_2 "OUT R"'
 Restart=always
 RestartSec=2
 

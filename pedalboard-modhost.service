@@ -6,7 +6,7 @@ Requires=pedalboard-jack.service
 [Service]
 Type=simple
 User=laenzi
-ExecStart=/usr/local/bin/mod-host -n -p 5555
+ExecStart=/usr/local/bin/mod-host -n -p 5555 -f 5556
 Restart=always
 RestartSec=2
 
