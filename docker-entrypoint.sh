@@ -3,6 +3,11 @@ set -e
 
 echo "Starting pedalboard test environment..."
 
+# Install favorites if empty
+if [ ! -f /opt/mod-ui/data/favorites.json ] || [ "$(cat /opt/mod-ui/data/favorites.json)" = "[]" ]; then
+    cp /opt/pedalboard-os/mod-favorites.json /opt/mod-ui/data/favorites.json 2>/dev/null || true
+fi
+
 # Start JACK with dummy driver (no real audio hardware)
 jackd -d dummy -r 48000 -p 256 &
 sleep 1
