@@ -26,6 +26,18 @@ deps: ## Install all audio dependencies (JACK, mod-host, plugins, AIDA-X)
 	@echo "Patching for Python 3.11 + Tornado 4.5 compatibility..."
 	sudo sed -i '1s/^/import collections.abc\nimport collections\ncollections.MutableMapping = collections.abc.MutableMapping\ncollections.Callable = collections.abc.Callable\n/' /opt/mod-ui/server.py
 	cd /opt/mod-ui/utils && make
+	@echo "Installing MOD plugin GUIs..."
+	cd /tmp && rm -rf mod-lv2-data && git clone --depth 1 https://github.com/moddevices/mod-lv2-data.git \
+		&& for dir in /usr/lib/lv2/*.lv2; do \
+			name=$$(basename $$dir); \
+			if [ -d /tmp/mod-lv2-data/plugins-fixed/$$name/modgui ]; then \
+				sudo cp -r /tmp/mod-lv2-data/plugins-fixed/$$name/modgui $$dir/; \
+				sudo cp /tmp/mod-lv2-data/plugins-fixed/$$name/*.ttl $$dir/ 2>/dev/null || true; \
+			elif [ -d /tmp/mod-lv2-data/plugins/$$name/modgui ]; then \
+				sudo cp -r /tmp/mod-lv2-data/plugins/$$name/modgui $$dir/; \
+				sudo cp /tmp/mod-lv2-data/plugins/$$name/*.ttl $$dir/ 2>/dev/null || true; \
+			fi; \
+		done && rm -rf /tmp/mod-lv2-data
 	@echo "All dependencies installed."
 	@echo ""
 	@echo "Recommended plugins for guitar pedalboard:"
