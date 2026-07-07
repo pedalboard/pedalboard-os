@@ -6,12 +6,12 @@ SERVICES = pedalboard-jack pedalboard-modhost pedalboard-bridge
 CONFIG_DIR = /etc/pedalboard
 
 deps: ## Install all audio dependencies (JACK, mod-host, plugins, AIDA-X)
-	sudo apt-get update -qq
-	sudo apt-get install -y -qq jackd2 liblilv-dev libreadline-dev libfftw3-dev libjack-jackd2-dev lilv-utils
+	sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq jackd2 liblilv-dev libreadline-dev libfftw3-dev libjack-jackd2-dev lilv-utils
 	@echo "Installing LV2 plugins (curated for guitar pedalboard)..."
-	sudo apt-get install -y -qq calf-plugins guitarix-lv2 x42-plugins
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq calf-plugins guitarix-lv2 x42-plugins
 	@echo "Installing MOD UI dependencies..."
-	sudo apt-get install -y -qq python3 python3-pip python3-pil python3-numpy
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3 python3-pip python3-pil python3-numpy
 	sudo pip3 install 'tornado>=4.3,<5'
 	@echo "Building mod-host from source..."
 	cd /tmp && rm -rf mod-host && git clone https://github.com/mod-audio/mod-host.git && cd mod-host && make -j$$(nproc) && sudo make install
