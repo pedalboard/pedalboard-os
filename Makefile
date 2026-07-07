@@ -17,8 +17,11 @@ deps: ## Install all audio dependencies (JACK, mod-host, plugins, AIDA-X)
 	cd /tmp && rm -rf mod-host && git clone https://github.com/mod-audio/mod-host.git && cd mod-host && make -j$$(nproc) && sudo make install
 	@echo "Building AIDA-X (headless LV2) from source..."
 	cd /tmp && rm -rf aidadsp-lv2 && git clone --depth 1 --recursive https://github.com/AidaDSP/aidadsp-lv2.git \
-		&& cd aidadsp-lv2 && cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr && cmake --build build -j$$(nproc)
-	sudo cmake --install /tmp/aidadsp-lv2/build
+		&& cd aidadsp-lv2 && cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j$$(nproc)
+	sudo mkdir -p /usr/lib/lv2/rt-neural-generic.lv2/modgui
+	sudo cp /tmp/aidadsp-lv2/build/rt-neural-generic/rt-neural-generic.so /usr/lib/lv2/rt-neural-generic.lv2/
+	sudo cp /tmp/aidadsp-lv2/rt-neural-generic/ttl/*.ttl /usr/lib/lv2/rt-neural-generic.lv2/
+	sudo cp -r /tmp/aidadsp-lv2/rt-neural-generic/ttl/modgui/* /usr/lib/lv2/rt-neural-generic.lv2/modgui/
 	@echo "Installing MOD UI..."
 	@if [ ! -d /opt/mod-ui ]; then \
 		sudo git clone --depth 1 https://github.com/mod-audio/mod-ui.git /opt/mod-ui; \
@@ -99,7 +102,7 @@ dev-down: ## Stop local test environment
 	docker compose down
 
 # LV2 bundles to keep (curated for guitar pedalboard)
-LV2_KEEP = calf.lv2 \
+LV2_KEEP = calf.lv2 rt-neural-generic.lv2 \
 	gxts9.lv2 gx_bmp.lv2 gx_aclipper.lv2 gx_fuzz.lv2 gx_fumaster.lv2 \
 	gx_compressor.lv2 gx_mbreverb.lv2 gx_chorus.lv2 gx_tremolo.lv2 \
 	gx_flanger.lv2 gx_phaser.lv2 gx_delay.lv2 gx_digital_delay.lv2 \
