@@ -5,6 +5,16 @@
 SERVICES = pedalboard-jack pedalboard-modhost pedalboard-bridge
 CONFIG_DIR = /etc/pedalboard
 
+deps: ## Install all audio dependencies (JACK, mod-host, plugins, AIDA-X)
+	sudo apt-get update -qq
+	sudo apt-get install -y -qq jackd2 liblilv-dev libreadline-dev libfftw3-dev libjack-jackd2-dev lilv-utils calf-plugins x42-plugins
+	@echo "Building mod-host from source..."
+	cd /tmp && rm -rf mod-host && git clone https://github.com/mod-audio/mod-host.git && cd mod-host && make -j4 && sudo make install
+	@echo "Building AIDA-X from source..."
+	cd /tmp && rm -rf AIDA-X && git clone --recursive https://github.com/AidaDSP/AIDA-X.git && cd AIDA-X && cmake -B build -DCMAKE_BUILD_TYPE=Release && cd build && make -j4
+	sudo cp -r /tmp/AIDA-X/build/bin/AIDA-X.lv2 /usr/lib/lv2/
+	@echo "All dependencies installed."
+
 install: ## Install services and configuration
 	@echo "Installing pedalboard services for user $(USER)..."
 	sed 's/User=laenzi/User=$(USER)/' pedalboard-jack.service | sudo tee /etc/systemd/system/pedalboard-jack.service >/dev/null
