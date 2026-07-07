@@ -1,0 +1,16 @@
+services:
+  pedalboard:
+    build: .
+    ports:
+      - "8888:8888"  # MOD UI
+      - "8080:8080"  # Bridge
+    environment:
+      - MODE=design  # "design" for MOD UI, "live" for bridge
+    volumes:
+      # Mount bridge binary from local build (optional)
+      # - ../pedalboard-bridge/pedalboard-bridge:/usr/local/bin/pedalboard-bridge
+      # Persist pedalboard saves
+      - pedalboard-data:/home/pedalboard/.pedalboards
+
+volumes:
+  pedalboard-data:

@@ -1,4 +1,4 @@
-.PHONY: install uninstall enable disable status help
+.PHONY: install uninstall enable disable status help deps dev dev-live dev-down
 
 .DEFAULT_GOAL := help
 
@@ -10,11 +10,17 @@ deps: ## Install all audio dependencies (JACK, mod-host, plugins, AIDA-X)
 	sudo apt-get install -y -qq jackd2 liblilv-dev libreadline-dev libfftw3-dev libjack-jackd2-dev lilv-utils
 	@echo "Installing LV2 plugins (curated for guitar pedalboard)..."
 	sudo apt-get install -y -qq calf-plugins guitarix-lv2 x42-plugins
+	@echo "Installing MOD UI dependencies..."
+	sudo apt-get install -y -qq python3 python3-tornado python3-pil python3-numpy
 	@echo "Building mod-host from source..."
-	cd /tmp && rm -rf mod-host && git clone https://github.com/mod-audio/mod-host.git && cd mod-host && make -j4 && sudo make install
+	cd /tmp && rm -rf mod-host && git clone https://github.com/mod-audio/mod-host.git && cd mod-host && make -j$$(nproc) && sudo make install
 	@echo "Building AIDA-X from source..."
-	cd /tmp && rm -rf AIDA-X && git clone --recursive https://github.com/AidaDSP/AIDA-X.git && cd AIDA-X && cmake -B build -DCMAKE_BUILD_TYPE=Release && cd build && make -j4
+	cd /tmp && rm -rf AIDA-X && git clone --recursive https://github.com/AidaDSP/AIDA-X.git && cd AIDA-X && cmake -B build -DCMAKE_BUILD_TYPE=Release && cd build && make -j$$(nproc)
 	sudo cp -r /tmp/AIDA-X/build/bin/AIDA-X.lv2 /usr/lib/lv2/
+	@echo "Installing MOD UI..."
+	@if [ ! -d /opt/mod-ui ]; then \
+		sudo git clone --depth 1 https://github.com/mod-audio/mod-ui.git /opt/mod-ui; \
+	fi
 	@echo "All dependencies installed."
 	@echo ""
 	@echo "Recommended plugins for guitar pedalboard:"
@@ -63,3 +69,12 @@ status: ## Show service status
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+
+dev: ## Run local test environment in Docker (MOD UI on localhost:8888)
+	docker compose up --build
+
+dev-live: ## Run local test environment in bridge/live mode (localhost:8080)
+	MODE=live docker compose up --build
+
+dev-down: ## Stop local test environment
+	docker compose down
