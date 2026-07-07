@@ -19,6 +19,7 @@ COPY . .
 RUN echo "jackd2 jackd/tweak_rt_limits boolean true" | debconf-set-selections
 RUN make deps
 RUN make install
+RUN make curate
 
 # Fix MOD UI data permissions for non-root user
 RUN mkdir -p /opt/mod-ui/data && chown -R pedalboard:pedalboard /opt/mod-ui/data

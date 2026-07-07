@@ -1,4 +1,4 @@
-.PHONY: install uninstall enable disable status help deps dev dev-live dev-down
+.PHONY: install uninstall enable disable status help deps dev dev-live dev-down curate
 
 .DEFAULT_GOAL := help
 
@@ -85,3 +85,23 @@ dev-live: ## Run local test environment in bridge/live mode (localhost:8080)
 
 dev-down: ## Stop local test environment
 	docker compose down
+
+# LV2 bundles to keep (curated for guitar pedalboard)
+LV2_KEEP = calf.lv2 \
+	gxts9.lv2 gx_bmp.lv2 gx_aclipper.lv2 gx_fuzz.lv2 gx_fumaster.lv2 \
+	gx_compressor.lv2 gx_mbreverb.lv2 gx_chorus.lv2 gx_tremolo.lv2 \
+	gx_flanger.lv2 gx_phaser.lv2 gx_delay.lv2 gx_digital_delay.lv2 \
+	gx_echo.lv2 gx_reverb.lv2 gx_cabinet.lv2 gx_amp.lv2 \
+	gxtuner.lv2 gxbooster.lv2 gxechocat.lv2 \
+	tuna.lv2 zeroconvo.lv2 fil4.lv2 darc.lv2
+
+curate: ## Remove non-curated LV2 plugins (keeps only essentials)
+	@echo "Removing non-curated plugins..."
+	@cd /usr/lib/lv2 && for dir in *.lv2; do \
+		keep=0; \
+		for w in $(LV2_KEEP); do \
+			[ "$$dir" = "$$w" ] && keep=1 && break; \
+		done; \
+		[ $$keep -eq 0 ] && [ -d "$$dir" ] && echo "  removing $$dir" && sudo rm -rf "$$dir" || true; \
+	done
+	@echo "Done. Kept $$(ls /usr/lib/lv2/*.lv2 -d 2>/dev/null | wc -l) plugin bundles."
