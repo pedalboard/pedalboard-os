@@ -1,6 +1,8 @@
 services:
   pedalboard:
-    build: .
+    build:
+      context: ..
+      dockerfile: dev/Dockerfile
     ports:
       - "8888:8888"  # MOD UI
       - "8080:8080"  # Bridge
@@ -9,7 +11,7 @@ services:
       - MODE=${MODE:-dev}
       - MOD_HOST_TIMEOUT=${MOD_HOST_TIMEOUT:-30s}
     volumes:
-      - ../pedalboard-bridge/pedalboard-bridge:/usr/local/bin/pedalboard-bridge
+      - ../../pedalboard-bridge/pedalboard-bridge:/usr/local/bin/pedalboard-bridge
       - sim-bin:/opt/sim-bin
       - pedalboard-data:/home/pedalboard/.pedalboards
 
@@ -19,8 +21,8 @@ services:
     profiles: ["sim"]
     working_dir: /src
     volumes:
-      - ../pedalboard-sim:/src
-      - ../pedalboard-protocol:/protocol
+      - ../../pedalboard-sim:/src
+      - ../../pedalboard-protocol:/protocol
       - sim-bin:/out
       - sim-cargo-cache:/usr/local/cargo/registry
       - sim-target-cache:/src/target

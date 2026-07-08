@@ -5,6 +5,8 @@
 SERVICES = pedalboard-jack pedalboard-modhost pedalboard-bridge
 CONFIG_DIR = /etc/pedalboard
 
+# ─── CM5 targets ───
+
 deps: ## Install all audio dependencies (JACK, mod-host, plugins, AIDA-X)
 	sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq
 	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq jackd2 liblilv-dev libreadline-dev libfftw3-dev libjack-jackd2-dev lilv-utils
@@ -42,32 +44,24 @@ deps: ## Install all audio dependencies (JACK, mod-host, plugins, AIDA-X)
 			fi; \
 		done && rm -rf /tmp/mod-lv2-data
 	@echo "All dependencies installed."
-	@echo ""
-	@echo "Recommended plugins for guitar pedalboard:"
-	@echo "  Amp:    AIDA-X (neural amp modeler)"
-	@echo "  Drive:  GxTubeScreamer, GxBigMuffPi, GxRat"
-	@echo "  Delay:  Calf Vintage Delay, Calf Reverse Delay"
-	@echo "  Reverb: Calf Reverb, GxMultiBandReverb"
-	@echo "  Mod:    Calf Flanger, GxChorus-Stereo, GxTremolo"
-	@echo "  Util:   Calf Compressor, x42 Instrument Tuner"
 
 install: ## Install services and configuration
 	@echo "Installing pedalboard services for user $(USER)..."
-	sed 's/User=laenzi/User=$(USER)/' pedalboard-jack.service | sudo tee /etc/systemd/system/pedalboard-jack.service >/dev/null
-	sed 's/User=laenzi/User=$(USER)/' pedalboard-modhost.service | sudo tee /etc/systemd/system/pedalboard-modhost.service >/dev/null
-	sed 's/User=laenzi/User=$(USER)/' pedalboard-modui.service | sudo tee /etc/systemd/system/pedalboard-modui.service >/dev/null
-	sed 's/User=laenzi/User=$(USER)/' pedalboard-bridge.service | sudo tee /etc/systemd/system/pedalboard-bridge.service >/dev/null
+	sed 's/User=laenzi/User=$(USER)/' services/pedalboard-jack.service | sudo tee /etc/systemd/system/pedalboard-jack.service >/dev/null
+	sed 's/User=laenzi/User=$(USER)/' services/pedalboard-modhost.service | sudo tee /etc/systemd/system/pedalboard-modhost.service >/dev/null
+	sed 's/User=laenzi/User=$(USER)/' services/pedalboard-modui.service | sudo tee /etc/systemd/system/pedalboard-modui.service >/dev/null
+	sed 's/User=laenzi/User=$(USER)/' services/pedalboard-bridge.service | sudo tee /etc/systemd/system/pedalboard-bridge.service >/dev/null
 	sudo mkdir -p $(CONFIG_DIR)/models
-	sudo cp env $(CONFIG_DIR)/env
-	sudo cp mod-hardware-descriptor.json /etc/mod-hardware-descriptor.json
-	sudo cp models/*.json $(CONFIG_DIR)/models/
+	sudo cp services/env $(CONFIG_DIR)/env
+	sudo cp services/mod-hardware-descriptor.json /etc/mod-hardware-descriptor.json
+	sudo cp audio/models/*.json $(CONFIG_DIR)/models/
 	@if [ -d /opt/mod-ui/data ]; then \
 		if [ ! -f /opt/mod-ui/data/favorites.json ] || [ "$$(cat /opt/mod-ui/data/favorites.json)" = "[]" ]; then \
-			sudo cp mod-favorites.json /opt/mod-ui/data/favorites.json; \
+			sudo cp audio/mod-favorites.json /opt/mod-ui/data/favorites.json; \
 		fi; \
 	fi
 	@if [ ! -f $(CONFIG_DIR)/audio-patches.json ]; then \
-		sudo cp audio-patches.json $(CONFIG_DIR)/audio-patches.json; \
+		sudo cp audio/audio-patches.json $(CONFIG_DIR)/audio-patches.json; \
 	else \
 		echo "$(CONFIG_DIR)/audio-patches.json already exists, skipping"; \
 	fi
@@ -89,27 +83,19 @@ disable: ## Stop and disable services
 status: ## Show service status
 	@systemctl status $(addsuffix .service,$(SERVICES)) --no-pager || true
 
-help:
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+# ─── Dev targets ───
 
 dev: ## Run local dev environment (bridge:8080 + sim:3001 + MOD UI:8888)
-	docker compose --profile sim run --rm --build sim-build 2>/dev/null || true
-	docker compose up --build
+	docker compose -f dev/docker-compose.yml --profile sim run --rm --build sim-build 2>/dev/null || true
+	docker compose -f dev/docker-compose.yml up --build
 
 dev-down: ## Stop local dev environment
-	docker compose down
+	docker compose -f dev/docker-compose.yml down
 
-e2e: ## Run end-to-end audio routing tests in Docker
-	MODE=test MOD_HOST_TIMEOUT=2s docker compose run --rm --build pedalboard /opt/pedalboard-os/tests/e2e-audio.sh
+e2e: ## Run end-to-end audio routing tests
+	MODE=test MOD_HOST_TIMEOUT=2s docker compose -f dev/docker-compose.yml run --rm --build pedalboard /opt/pedalboard-os/tests/e2e-audio.sh
 
-# LV2 bundles to keep (curated for guitar pedalboard)
-LV2_KEEP = calf.lv2 rt-neural-generic.lv2 \
-	gxts9.lv2 gx_bmp.lv2 gx_aclipper.lv2 gx_fuzz.lv2 gx_fumaster.lv2 \
-	gx_compressor.lv2 gx_mbreverb.lv2 gx_chorus.lv2 gx_tremolo.lv2 \
-	gx_flanger.lv2 gx_phaser.lv2 gx_delay.lv2 gx_digital_delay.lv2 \
-	gx_echo.lv2 gx_reverb.lv2 gx_cabinet.lv2 gx_amp.lv2 \
-	gxtuner.lv2 gxbooster.lv2 gxechocat.lv2 \
-	tuna.lv2 zeroconvo.lv2 fil4.lv2 darc.lv2
+# ─── Utilities ───
 
 curate: ## Remove non-curated LV2 plugins (keeps only essentials)
 	@echo "Removing non-curated plugins..."
@@ -121,3 +107,15 @@ curate: ## Remove non-curated LV2 plugins (keeps only essentials)
 		[ $$keep -eq 0 ] && [ -d "$$dir" ] && echo "  removing $$dir" && sudo rm -rf "$$dir" || true; \
 	done
 	@echo "Done. Kept $$(ls /usr/lib/lv2/*.lv2 -d 2>/dev/null | wc -l) plugin bundles."
+
+# LV2 bundles to keep (curated for guitar pedalboard)
+LV2_KEEP = calf.lv2 rt-neural-generic.lv2 \
+	gxts9.lv2 gx_bmp.lv2 gx_aclipper.lv2 gx_fuzz.lv2 gx_fumaster.lv2 \
+	gx_compressor.lv2 gx_mbreverb.lv2 gx_chorus.lv2 gx_tremolo.lv2 \
+	gx_flanger.lv2 gx_phaser.lv2 gx_delay.lv2 gx_digital_delay.lv2 \
+	gx_echo.lv2 gx_reverb.lv2 gx_cabinet.lv2 gx_amp.lv2 \
+	gxtuner.lv2 gxbooster.lv2 gxechocat.lv2 \
+	tuna.lv2 zeroconvo.lv2 fil4.lv2 darc.lv2
+
+help:
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'

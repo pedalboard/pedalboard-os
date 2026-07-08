@@ -25,10 +25,10 @@ RUN make curate
 # Fix MOD UI data permissions for non-root user
 RUN mkdir -p /opt/mod-ui/data && chown -R pedalboard:pedalboard /opt/mod-ui/data
 RUN mkdir -p /home/pedalboard/.pedalboards && chown -R pedalboard:pedalboard /home/pedalboard/.pedalboards
-COPY mod-favorites.json /opt/mod-ui/data/favorites.json
+COPY audio/mod-favorites.json /opt/mod-ui/data/favorites.json
 RUN chown pedalboard:pedalboard /opt/mod-ui/data/favorites.json
 
-COPY docker-entrypoint.sh /entrypoint.sh
+COPY dev/docker-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Generate test audio signal (1s 440Hz sine wave, 48kHz mono, 32-bit float)
@@ -40,6 +40,6 @@ COPY tests/ /opt/pedalboard-os/tests/
 RUN chmod +x /opt/pedalboard-os/tests/*.sh 2>/dev/null || true
 
 USER pedalboard
-EXPOSE 8080 8888
+EXPOSE 8080 8888 3001
 
 ENTRYPOINT ["/entrypoint.sh"]
