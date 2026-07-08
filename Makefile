@@ -1,4 +1,4 @@
-.PHONY: install uninstall enable disable status help deps dev dev-live dev-down curate
+.PHONY: install uninstall enable disable status help deps dev dev-down e2e curate
 
 .DEFAULT_GOAL := help
 
@@ -92,14 +92,15 @@ status: ## Show service status
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-dev: ## Run local test environment in Docker (MOD UI on localhost:8888)
+dev: ## Run local dev environment (bridge:8080 + sim:3001 + MOD UI:8888)
+	docker compose --profile sim run --rm --build sim-build 2>/dev/null || true
 	docker compose up --build
 
-dev-live: ## Run local test environment in bridge/live mode (localhost:8080)
-	MODE=live docker compose up --build
-
-dev-down: ## Stop local test environment
+dev-down: ## Stop local dev environment
 	docker compose down
+
+e2e: ## Run end-to-end audio routing tests in Docker
+	MODE=test MOD_HOST_TIMEOUT=2s docker compose run --rm --build pedalboard /opt/pedalboard-os/tests/e2e-audio.sh
 
 # LV2 bundles to keep (curated for guitar pedalboard)
 LV2_KEEP = calf.lv2 rt-neural-generic.lv2 \

@@ -62,6 +62,23 @@ volumes:
   - ../pedalboard-bridge/pedalboard-bridge:/usr/local/bin/pedalboard-bridge
 ```
 
+### Sim mode — full stack with the virtual pedalboard
+
+```bash
+make dev-sim
+```
+
+Runs the complete audio chain with the pedalboard simulator:
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| Bridge | http://localhost:8080 | Receives MIDI, switches audio patches |
+| Simulator | http://localhost:3001 | Virtual pedalboard (buttons, encoders, LEDs) |
+
+The simulator sends raw MIDI through a FIFO to the bridge — identical to how the real RP2040 controller communicates via `/dev/snd/midiC*D*`. Press buttons in the web UI to trigger preset changes.
+
+First run builds the simulator in a Rust container (cached after that).
+
 ### Testing against the dev environment
 
 ```bash
@@ -79,6 +96,28 @@ cargo run -- upload <preset.yaml>
 ```bash
 make dev-down
 ```
+
+### End-to-end tests — verify audio routing
+
+```bash
+make e2e
+```
+
+Runs automated tests inside Docker that verify the bridge correctly switches audio plugin chains via mod-host when it receives MIDI Program Change messages. The test uses:
+
+- **JACK dummy driver** for audio port topology (no real audio hardware)
+- **MIDI FIFO** simulating the raw ALSA device (`/dev/snd/midiC99D0`) — the test writes Program Change bytes directly to the FIFO
+- **jack-play / jack-record** + **sox** for audio signal injection and verification
+
+Test cases:
+1. Bridge starts in live mode
+2. Initial patch (preset 0) loads on startup
+3. Preset switch changes JACK connections
+4. Audio signal passes through plugin chain
+5. Different presets produce different configurations
+6. Invalid preset number doesn't crash the bridge
+
+When the MIDI simulator is ready, it can replace the FIFO by connecting as the actual USB MIDI device (or by writing to the same FIFO path for integration testing).
 
 ## Manual Testing (on CM5)
 

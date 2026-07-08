@@ -4,13 +4,37 @@ services:
     ports:
       - "8888:8888"  # MOD UI
       - "8080:8080"  # Bridge
+      - "3001:3001"  # Simulator web UI
     environment:
-      - MODE=design  # "design" for MOD UI, "live" for bridge
+      - MODE=${MODE:-dev}
+      - MOD_HOST_TIMEOUT=${MOD_HOST_TIMEOUT:-30s}
     volumes:
-      # Mount bridge binary from local build (optional)
-      # - ../pedalboard-bridge/pedalboard-bridge:/usr/local/bin/pedalboard-bridge
-      # Persist pedalboard saves
+      - ../pedalboard-bridge/pedalboard-bridge:/usr/local/bin/pedalboard-bridge
+      - sim-bin:/opt/sim-bin
       - pedalboard-data:/home/pedalboard/.pedalboards
+
+  # Builds the simulator binary for the container's glibc (first run only)
+  sim-build:
+    image: rust:bookworm
+    profiles: ["sim"]
+    working_dir: /src
+    volumes:
+      - ../pedalboard-sim:/src
+      - ../pedalboard-protocol:/protocol
+      - sim-bin:/out
+      - sim-cargo-cache:/usr/local/cargo/registry
+      - sim-target-cache:/src/target
+    command: >
+      bash -c "
+        apt-get update -qq && apt-get install -y -qq libasound2-dev >/dev/null 2>&1 &&
+        ln -sf /protocol /src/../pedalboard-protocol &&
+        cargo build --release &&
+        cp target/release/pedalboard-sim /out/ &&
+        cp config.bin /out/ 2>/dev/null || true
+      "
 
 volumes:
   pedalboard-data:
+  sim-bin:
+  sim-cargo-cache:
+  sim-target-cache:

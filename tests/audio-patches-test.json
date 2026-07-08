@@ -1,0 +1,27 @@
+{
+  "capture_port": "system:capture_2",
+  "playback_port": "system:playback_2",
+  "patches": [
+    {
+      "name": "Test Flanger",
+      "plugins": [
+        { "uri": "http://calf.sourceforge.net/plugins/Flanger", "id": 0, "input": "in_l", "output": "out_l" }
+      ],
+      "params": []
+    },
+    {
+      "name": "Test Phaser",
+      "plugins": [
+        { "uri": "http://calf.sourceforge.net/plugins/Phaser", "id": 0, "input": "in_l", "output": "out_l" }
+      ],
+      "params": []
+    },
+    {
+      "name": "Test Compressor",
+      "plugins": [
+        { "uri": "http://guitarix.sourceforge.net/plugins/gx_compressor#_compressor", "id": 0 }
+      ],
+      "params": []
+    }
+  ]
+}
