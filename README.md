@@ -37,7 +37,50 @@ sudo reboot
         └── model.aidax
 ```
 
-## Manual Testing
+## Local Development
+
+Run the full audio stack locally in Docker (no CM5 or soundcard required):
+
+### Design mode — build plugin chains in MOD UI
+
+```bash
+make dev
+```
+
+Opens MOD UI at http://localhost:8888. Uses a JACK dummy driver for audio routing without real hardware.
+
+### Live mode — test with the bridge
+
+```bash
+make dev-live
+```
+
+Runs pedalboard-bridge at http://localhost:8080. To test with a local bridge build, uncomment the volume mount in `docker-compose.yml`:
+
+```yaml
+volumes:
+  - ../pedalboard-bridge/pedalboard-bridge:/usr/local/bin/pedalboard-bridge
+```
+
+### Testing against the dev environment
+
+```bash
+# Verify MOD UI is running (design mode)
+curl -s http://localhost:8888 | head
+
+# Test with pedalboard-cli (live mode)
+cd ../pedalboard-cli
+cargo run -- monitor
+cargo run -- upload <preset.yaml>
+```
+
+### Stop
+
+```bash
+make dev-down
+```
+
+## Manual Testing (on CM5)
 
 ```bash
 # Check services
