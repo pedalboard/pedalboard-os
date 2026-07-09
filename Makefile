@@ -52,6 +52,8 @@ install: ## Install services and configuration
 	sed 's/User=laenzi/User=$(USER)/' services/pedalboard-modhost.service | sudo tee /etc/systemd/system/pedalboard-modhost.service >/dev/null
 	sed 's/User=laenzi/User=$(USER)/' services/pedalboard-modui.service | sudo tee /etc/systemd/system/pedalboard-modui.service >/dev/null
 	sed 's/User=laenzi/User=$(USER)/' services/pedalboard-bridge.service | sudo tee /etc/systemd/system/pedalboard-bridge.service >/dev/null
+	sudo cp udev/90-pedalboard-midi.rules /etc/udev/rules.d/
+	sudo udevadm control --reload-rules
 	sudo mkdir -p $(CONFIG_DIR)/models
 	sudo cp services/env $(CONFIG_DIR)/env
 	sudo cp services/mod-hardware-descriptor.json /etc/mod-hardware-descriptor.json

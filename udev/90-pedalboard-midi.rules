@@ -1,0 +1,4 @@
+# Pin ALSA card name for pedalboard USB MIDI device (RP2040, VID:PID 2e8a:0005)
+# This ensures JACK -X seq always creates the same port name regardless of
+# USB enumeration order or reconnect cycles.
+SUBSYSTEM=="sound", ATTRS{idVendor}=="2e8a", ATTRS{idProduct}=="0005", ATTR{id}="Pedalboard"
