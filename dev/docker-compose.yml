@@ -22,14 +22,14 @@ services:
     working_dir: /src
     volumes:
       - ../../pedalboard-sim:/src
-      - ../../pedalboard-protocol:/protocol
+      - ../../midi-controller:/protocol
       - sim-bin:/out
       - sim-cargo-cache:/usr/local/cargo/registry
       - sim-target-cache:/src/target
     command: >
       bash -c "
-        apt-get update -qq && apt-get install -y -qq libasound2-dev >/dev/null 2>&1 &&
-        ln -sf /protocol /src/../pedalboard-protocol &&
+        apt-get update -qq && apt-get install -y -qq libasound2-dev libjack-jackd2-dev >/dev/null 2>&1 &&
+        ln -sf /protocol /src/../midi-controller &&
         cargo build --release &&
         cp target/release/pedalboard-sim /out/ &&
         cp config.bin /out/ 2>/dev/null || true
