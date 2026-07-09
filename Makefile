@@ -9,6 +9,7 @@ CONFIG_DIR = /etc/pedalboard
 
 deps: ## Install all audio dependencies (JACK, mod-host, plugins, AIDA-X)
 	sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq
+	sudo DEBIAN_FRONTEND=noninteractive apt-get remove -y -qq pulseaudio pulseaudio-utils 2>/dev/null || true
 	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq jackd2 liblilv-dev libreadline-dev libfftw3-dev libjack-jackd2-dev lilv-utils
 	@echo "Installing LV2 plugins (curated for guitar pedalboard)..."
 	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq calf-plugins guitarix-lv2 x42-plugins
@@ -51,6 +52,9 @@ install: ## Install services and configuration
 	sed 's/User=laenzi/User=$(USER)/' services/pedalboard-modhost.service | sudo tee /etc/systemd/system/pedalboard-modhost.service >/dev/null
 	sed 's/User=laenzi/User=$(USER)/' services/pedalboard-modui.service | sudo tee /etc/systemd/system/pedalboard-modui.service >/dev/null
 	sed 's/User=laenzi/User=$(USER)/' services/pedalboard-bridge.service | sudo tee /etc/systemd/system/pedalboard-bridge.service >/dev/null
+	sudo cp services/pedalboard-midi-reconnect.service /etc/systemd/system/
+	sudo cp udev/90-pedalboard-midi.rules /etc/udev/rules.d/
+	sudo udevadm control --reload-rules
 	sudo mkdir -p $(CONFIG_DIR)/models
 	sudo cp services/env $(CONFIG_DIR)/env
 	sudo cp services/mod-hardware-descriptor.json /etc/mod-hardware-descriptor.json
