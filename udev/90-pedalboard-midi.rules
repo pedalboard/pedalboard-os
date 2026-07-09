@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="sound", ATTRS{idVendor}=="2e8a", ATTRS{idProduct}=="0005", TAG+="systemd", ENV{SYSTEMD_WANTS}="pedalboard-midi-reconnect.service"

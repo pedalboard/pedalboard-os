@@ -1,0 +1,7 @@
+[Unit]
+Description=Restart JACK + Bridge on pedalboard USB reconnect
+After=sound.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'sleep 1 && systemctl restart pedalboard-jack && sleep 2 && systemctl restart pedalboard-bridge'
