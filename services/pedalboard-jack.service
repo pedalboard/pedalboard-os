@@ -9,7 +9,7 @@ EnvironmentFile=/etc/pedalboard/env
 Environment=JACK_NO_AUDIO_RESERVATION=1
 ExecStartPre=/bin/sh -c '/usr/bin/amixer -c $AUDIO_CARD set "Auto Mute" off'
 ExecStartPre=/bin/sh -c '/usr/bin/amixer -c $AUDIO_CARD set "Auto Mute Mono" off'
-ExecStart=/bin/sh -c 'exec /usr/bin/jackd -d alsa -d hw:$AUDIO_CARD -r 48000 -p 64 -n 2 -i 2 -o 2'
+ExecStart=/bin/sh -c 'exec /usr/bin/jackd -d alsa -d hw:$AUDIO_CARD -r 48000 -p 64 -n 2 -i 2 -o 2 -X seq'
 ExecStartPost=/bin/sh -c 'sleep 0.5 && \
   jack_property -p -s system:capture_1 http://jackaudio.org/metadata/pretty-name "IN L" && \
   jack_property -p -s system:capture_2 http://jackaudio.org/metadata/pretty-name "IN R" && \
