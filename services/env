@@ -1,15 +1,11 @@
 # Pedalboard system configuration
-# Edit this file to match your hardware setup
 
-# System user to run services as (must be in 'audio' group)
-PEDALBOARD_USER=laenzi
+# ALSA sound card name (stable across reboots, unlike card numbers)
+# Find with: cat /proc/asound/cards
+AUDIO_CARD=sndrpihifiberry
 
-# ALSA sound card number (find with: cat /proc/asound/cards)
-AUDIO_CARD=3
-
-# MIDI port name (substring match in /proc/asound/cards)
-MIDI_PORT=OpenDeck
+# JACK MIDI auto-connect pattern (case-insensitive substring match)
+MIDI_MATCH=pedalboard-opendeck
 
 # Bridge HTTP/WebSocket port
 BRIDGE_PORT=8080
-MIDI_MATCH=auto

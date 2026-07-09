@@ -1,4 +1,4 @@
-.PHONY: install uninstall enable disable status help deps dev dev-down e2e curate
+.PHONY: install uninstall enable disable status help deps dev dev-down e2e curate harden
 
 .DEFAULT_GOAL := help
 
@@ -97,6 +97,42 @@ dev-down: ## Stop local dev environment
 
 e2e: ## Run end-to-end audio routing tests
 	MODE=test MOD_HOST_TIMEOUT=2s docker compose -f dev/docker-compose.yml run --rm --build pedalboard /opt/pedalboard-os/tests/e2e-audio.sh
+
+# ─── Hardening ───
+
+harden: ## Harden OS for reliable live use (disables services, sets RT limits, watchdog, fast boot)
+	@echo "Hardening CM5 for live pedalboard use..."
+	sudo bash hardening/disable-services.sh $(USER)
+	sudo cp hardening/audio-limits.conf /etc/security/limits.d/99-pedalboard-audio.conf
+	sudo cp hardening/blacklist-onboard-audio.conf /etc/modprobe.d/blacklist-onboard-audio.conf
+	sudo mkdir -p /etc/systemd/system.conf.d
+	sudo cp hardening/watchdog.conf /etc/systemd/system.conf.d/watchdog.conf
+	sudo bash hardening/fast-boot.sh
+	@echo ""
+	@echo "Hardening complete. Reboot to apply all changes."
+	@echo "After reboot, verify with: make harden-check"
+
+harden-check: ## Verify hardening is active
+	@echo "=== Disabled services ==="
+	@for s in bluetooth ModemManager cups lightdm triggerhappy; do \
+		printf "  %-20s %s\n" "$$s" "$$(systemctl is-enabled $$s 2>/dev/null || echo 'not found')"; \
+	done
+	@echo ""
+	@echo "=== RT limits ==="
+	@ulimit -r 2>/dev/null && echo "  rtprio: $$(ulimit -r)" || echo "  (check with: ulimit -r as audio user)"
+	@echo ""
+	@echo "=== Watchdog ==="
+	@cat /proc/sys/kernel/watchdog 2>/dev/null && echo "  kernel watchdog: active" || true
+	@test -f /dev/watchdog && echo "  /dev/watchdog: present" || echo "  /dev/watchdog: not found"
+	@echo ""
+	@echo "=== Blacklisted modules ==="
+	@lsmod | grep -q snd_bcm2835 && echo "  snd_bcm2835: LOADED (bad!)" || echo "  snd_bcm2835: not loaded (good)"
+	@echo ""
+	@echo "=== Boot config ==="
+	@cat /boot/firmware/cmdline.txt
+	@echo ""
+	@echo "=== Swap ==="
+	@swapon --show 2>/dev/null | grep -q . && echo "  SWAP ACTIVE (bad for RT!)" || echo "  No swap (good)"
 
 # ─── Utilities ───
 

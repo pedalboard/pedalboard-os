@@ -1,7 +1,7 @@
 [Unit]
 Description=Pedalboard mod-host (LV2 Plugin Host)
 After=pedalboard-jack.service
-Requires=pedalboard-jack.service
+Wants=pedalboard-jack.service
 
 [Service]
 Type=simple
