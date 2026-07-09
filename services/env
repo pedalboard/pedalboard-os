@@ -5,7 +5,7 @@
 AUDIO_CARD=sndrpihifiberry
 
 # JACK MIDI auto-connect pattern (case-insensitive substring match)
-MIDI_MATCH=pedalboard-opendeck
+MIDI_MATCH=pedalboard-midi
 
 # Bridge HTTP/WebSocket port
 BRIDGE_PORT=8080
