@@ -1,15 +1,18 @@
 [Unit]
-Description=Pedalboard Bridge (MIDI + Audio Switching)
+Description=Pedalboard Bridge (JACK MIDI + Audio Switching)
 After=pedalboard-modhost.service
 Wants=pedalboard-jack.service pedalboard-modhost.service
 
 [Service]
+LimitRTPRIO=95
+LimitMEMLOCK=infinity
 Type=simple
 User=laenzi
 EnvironmentFile=/etc/pedalboard/env
-ExecStart=/bin/sh -c 'exec /usr/local/bin/pedalboard-bridge -port $MIDI_PORT -addr :$BRIDGE_PORT -audio /etc/pedalboard/audio-patches.json'
+ExecStart=/udata/pedalboard-bridge/pedalboard-bridge-rust --midi ${MIDI_MATCH} --addr 0.0.0.0:${BRIDGE_PORT} --audio /etc/pedalboard/audio-rig.yaml --modhost localhost:5555
 Restart=always
 RestartSec=2
+Environment=RUST_LOG=info
 
 [Install]
 WantedBy=multi-user.target
