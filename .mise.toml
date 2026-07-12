@@ -1,2 +1,2 @@
 [env]
-PEDALBOARD_ADDR = "ws://localhost:8080/config"
+PEDALBOARD_ADDR = "ws://localhost:8080"
