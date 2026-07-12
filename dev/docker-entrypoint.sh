@@ -60,10 +60,10 @@ else
     SIM_BIN=$(command -v pedalboard-sim 2>/dev/null || echo "/opt/sim-bin/pedalboard-sim")
     if [ -x "$SIM_BIN" ]; then
         CONFIG_ARG=""
-        if [ -f /opt/sim-bin/config.bin ]; then
-            CONFIG_ARG="-c /opt/sim-bin/config.bin"
-        elif [ -f /opt/pedalboard-os/config.bin ]; then
-            CONFIG_ARG="-c /opt/pedalboard-os/config.bin"
+        if [ -f /opt/sim-bin/setlist.yaml ]; then
+            CONFIG_ARG="--yaml /opt/sim-bin/setlist.yaml"
+        elif [ -f /opt/pedalboard-os/setlist.yaml ]; then
+            CONFIG_ARG="--yaml /opt/pedalboard-os/setlist.yaml"
         fi
         "$SIM_BIN" --jack --web 0.0.0.0:3001 $CONFIG_ARG &
         sleep 1

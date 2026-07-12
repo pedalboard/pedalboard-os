@@ -32,7 +32,7 @@ services:
         ln -sf /protocol /src/../midi-controller &&
         cargo build --release &&
         cp target/release/pedalboard-sim /out/ &&
-        cp config.bin /out/ 2>/dev/null || true
+        cp setlist.yaml /out/ 2>/dev/null || true
       "
 
 volumes:
