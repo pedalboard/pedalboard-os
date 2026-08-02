@@ -114,6 +114,7 @@ harden: ## Harden OS for reliable live use (disables services, sets RT limits, w
 	sudo mkdir -p /etc/systemd/system.conf.d
 	sudo cp hardening/watchdog.conf /etc/systemd/system.conf.d/watchdog.conf
 	sudo bash hardening/fast-boot.sh
+	sudo bash hardening/audio-rt.sh
 	@echo ""
 	@echo "Hardening complete. Reboot to apply all changes."
 	@echo "After reboot, verify with: make harden-check"
