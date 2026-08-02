@@ -15,10 +15,13 @@ System configuration for the Open Pedalboard audio+MIDI platform running on Rasp
 ### 1. Install audio dependencies (once, takes ~10 min on CM5)
 
 ```bash
-git clone https://github.com/pedalboard/pedalboard-os.git
-cd pedalboard-os
+git clone https://github.com/pedalboard/pedalboard-os.git ~/projects/pedalboard-os
+cd ~/projects/pedalboard-os
 make deps
 ```
+
+This installs JACK, mod-host (built from source), calf-plugins, guitarix-lv2,
+and AIDA-X via the [KXStudio repository](https://kx.studio/Repositories).
 
 ### 2. Deploy latest release
 

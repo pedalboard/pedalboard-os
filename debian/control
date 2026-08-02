@@ -14,7 +14,8 @@ Depends: ${misc:Depends},
  adduser,
  systemd,
  calf-plugins,
- guitarix-lv2
+ guitarix-lv2,
+ aida-x
 Recommends: mod-host
 Description: Pedalboard OS — systemd services and configuration for CM5
  Installs and manages all systemd units, systemd targets, udev rules,
@@ -22,8 +23,9 @@ Description: Pedalboard OS — systemd services and configuration for CM5
  system running on a Compute Module 5.
  .
  Depends on pedalboard-bridge for the JACK MIDI + audio switching service,
- calf-plugins and guitarix-lv2 for the default audio rig.
- AIDA-X (rt-neural-generic) must be installed separately via make deps.
+ calf-plugins and guitarix-lv2 for the default audio rig, and aida-x
+ (from the KXStudio repository) for neural amp modeling.
+ Run 'make deps' first to add the KXStudio repository and install mod-host.
  .
  Includes gig mode (pedalboard-gig.target) and studio mode
  (pedalboard-dev.target) for switching between minimal audio-only

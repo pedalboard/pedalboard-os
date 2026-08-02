@@ -17,18 +17,18 @@ deps: ## Install all audio dependencies (JACK, mod-host, plugins, AIDA-X)
 	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq jackd2 liblilv-dev libreadline-dev libfftw3-dev libjack-jackd2-dev lilv-utils
 	@echo "Installing LV2 plugins (curated for guitar pedalboard)..."
 	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq calf-plugins guitarix-lv2 x42-plugins
+	@echo "Adding KXStudio repository for AIDA-X..."
+	sudo apt-get install -y -qq gpgv wget
+	wget -q https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos_11.2.0_all.deb -O /tmp/kxstudio-repos.deb
+	sudo dpkg -i /tmp/kxstudio-repos.deb && rm /tmp/kxstudio-repos.deb
+	sudo apt-get update -qq
+	@echo "Installing AIDA-X (neural amp loader)..."
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq aida-x
 	@echo "Installing MOD UI dependencies..."
 	sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3 python3-pip python3-pil python3-numpy
 	sudo pip3 install --break-system-packages 'tornado==4.5.3'
 	@echo "Building mod-host from source..."
 	cd /tmp && rm -rf mod-host && git clone https://github.com/mod-audio/mod-host.git && cd mod-host && make -j$$(nproc) && sudo make install
-	@echo "Building AIDA-X (headless LV2) from source..."
-	cd /tmp && rm -rf aidadsp-lv2 && git clone --depth 1 --recursive https://github.com/AidaDSP/aidadsp-lv2.git \
-		&& cd aidadsp-lv2 && cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j$$(nproc)
-	sudo mkdir -p /usr/lib/lv2/rt-neural-generic.lv2/modgui
-	sudo cp /tmp/aidadsp-lv2/build/rt-neural-generic/rt-neural-generic.so /usr/lib/lv2/rt-neural-generic.lv2/
-	sudo cp /tmp/aidadsp-lv2/rt-neural-generic/ttl/*.ttl /usr/lib/lv2/rt-neural-generic.lv2/
-	sudo cp -r /tmp/aidadsp-lv2/rt-neural-generic/ttl/modgui/* /usr/lib/lv2/rt-neural-generic.lv2/modgui/
 	@echo "Installing MOD UI..."
 	@if [ ! -d /opt/mod-ui ]; then \
 		sudo git clone --depth 1 https://github.com/mod-audio/mod-ui.git /opt/mod-ui; \
