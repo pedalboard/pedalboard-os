@@ -21,7 +21,7 @@ jobs:
       - name: Build .deb
         run: dpkg-buildpackage -us -uc -b
 
-      - name: Move artifact
+      - name: Collect artifact
         run: |
           mkdir -p dist
           mv ../pedalboard-os_*.deb dist/
@@ -32,7 +32,16 @@ jobs:
           name: pedalboard-os-deb
           path: dist/pedalboard-os_*.deb
 
-      - name: Attach to release
+      - name: Publish rolling latest release (main branch)
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest (main)
+          prerelease: true
+          files: dist/pedalboard-os_*.deb
+
+      - name: Publish versioned release (tag)
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
