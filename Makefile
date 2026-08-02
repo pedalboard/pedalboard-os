@@ -7,6 +7,7 @@ CONFIG_DIR = /etc/pedalboard
 
 GITHUB_ORG     = pedalboard
 OS_REPO        = pedalboard-os
+BRIDGE_REPO    = pedalboard-bridge
 
 # ─── CM5 targets ───
 
@@ -55,17 +56,29 @@ uninstall: ## Remove services and configuration
 	sudo dpkg -r pedalboard-os || true
 	@echo "Services removed. Config left in $(CONFIG_DIR)."
 
-deploy: ## Download and install latest release
+deploy: ## Download and install latest release (OS config + bridge)
 	@echo "Deploying latest pedalboard release..."
-	@DEB_URL=$$(curl -sf "https://api.github.com/repos/$(GITHUB_ORG)/$(OS_REPO)/releases/tags/latest" \
+	@# Install pedalboard-bridge .deb
+	@BRIDGE_DEB_URL=$$(curl -sf "https://api.github.com/repos/$(GITHUB_ORG)/$(BRIDGE_REPO)/releases/tags/latest" \
 		| grep -o '"browser_download_url": *"[^"]*_arm64\.deb"' \
 		| grep -o 'https://[^"]*') && \
-	if [ -z "$$DEB_URL" ]; then \
+	if [ -z "$$BRIDGE_DEB_URL" ]; then \
+		echo "Error: could not find arm64 .deb in latest release of $(BRIDGE_REPO)" >&2; exit 1; \
+	fi && \
+	echo "  Installing $$BRIDGE_DEB_URL" && \
+	curl -sL "$$BRIDGE_DEB_URL" -o /tmp/pedalboard-bridge.deb && \
+	sudo systemctl stop pedalboard-bridge 2>/dev/null || true && \
+	sudo dpkg -i /tmp/pedalboard-bridge.deb && \
+	rm -f /tmp/pedalboard-bridge.deb
+	@# Install pedalboard-os .deb
+	@OS_DEB_URL=$$(curl -sf "https://api.github.com/repos/$(GITHUB_ORG)/$(OS_REPO)/releases/tags/latest" \
+		| grep -o '"browser_download_url": *"[^"]*_all\.deb"' \
+		| grep -o 'https://[^"]*') && \
+	if [ -z "$$OS_DEB_URL" ]; then \
 		echo "Error: could not find .deb in latest release of $(OS_REPO)" >&2; exit 1; \
 	fi && \
-	echo "  Downloading $$DEB_URL" && \
-	curl -sL "$$DEB_URL" -o /tmp/pedalboard-os.deb && \
-	sudo systemctl stop pedalboard-bridge 2>/dev/null || true && \
+	echo "  Installing $$OS_DEB_URL" && \
+	curl -sL "$$OS_DEB_URL" -o /tmp/pedalboard-os.deb && \
 	sudo dpkg -i /tmp/pedalboard-os.deb && \
 	rm -f /tmp/pedalboard-os.deb
 	@echo "Deploy complete. Run 'make status' to verify."

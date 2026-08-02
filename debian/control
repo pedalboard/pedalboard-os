@@ -2,22 +2,24 @@ Source: pedalboard-os
 Section: sound
 Priority: optional
 Maintainer: Christof Laenzlinger <christof@laenzlinger.ch>
-Build-Depends: debhelper-compat (= 13), curl
+Build-Depends: debhelper-compat (= 13)
 Standards-Version: 4.6.2
 Homepage: https://github.com/pedalboard/pedalboard-os
 
 Package: pedalboard-os
-Architecture: arm64
+Architecture: all
 Depends: ${misc:Depends},
+ pedalboard-bridge,
  jackd2,
  adduser,
  systemd
 Recommends: mod-host
-Description: Pedalboard OS — systemd services, config and bridge for CM5
+Description: Pedalboard OS — systemd services and configuration for CM5
  Installs and manages all systemd units, systemd targets, udev rules,
- runtime configuration, and the pedalboard-bridge binary for the
- pedalboard audio system running on a Compute Module 5.
+ and runtime configuration for the pedalboard audio system running on
+ a Compute Module 5.
  .
+ Depends on pedalboard-bridge for the JACK MIDI + audio switching service.
  Includes gig mode (pedalboard-gig.target) and studio mode
  (pedalboard-dev.target) for switching between minimal audio-only
  and full development stack at runtime.
