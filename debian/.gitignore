@@ -1,0 +1,9 @@
+# debhelper build artefacts — generated during dpkg-buildpackage, not source
+.debhelper/
+debhelper-build-stamp
+files
+*.substvars
+pedalboard-os/
+pedalboard-os.postrm.debhelper
+pedalboard-os.postinst.debhelper
+pedalboard-os.prerm.debhelper
