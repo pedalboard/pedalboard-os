@@ -27,6 +27,16 @@ case "$1" in
         install -d -o "$PEDALBOARD_USER" -g "$PEDALBOARD_GROUP" -m 750 \
             /var/lib/pedalboard
 
+        # Install MOD UI favorites if MOD UI is present and not already configured.
+        if [ -d /opt/mod-ui/data ]; then
+            if [ ! -f /opt/mod-ui/data/favorites.json ] || \
+               [ "$(cat /opt/mod-ui/data/favorites.json 2>/dev/null)" = "[]" ]; then
+                cp /etc/pedalboard/mod-favorites.json /opt/mod-ui/data/favorites.json
+                chown "$PEDALBOARD_USER:$PEDALBOARD_GROUP" /opt/mod-ui/data/favorites.json \
+                    2>/dev/null || true
+            fi
+        fi
+
         # Substitute pedalboard user into service files.
         for svc in \
             /lib/systemd/system/pedalboard-jack.service \
