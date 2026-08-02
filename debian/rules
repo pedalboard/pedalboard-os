@@ -1,9 +1,15 @@
 #!/usr/bin/make -f
+
+BRIDGE_RELEASE_URL = https://github.com/pedalboard/pedalboard-bridge/releases/download/latest/pedalboard-bridge-arm64
+
 %:
 	dh $@
 
-# No build step — this is a data-only package.
+# Fetch the bridge binary from the latest pedalboard-bridge release.
 override_dh_auto_build:
+	mkdir -p bridge
+	curl -sL "$(BRIDGE_RELEASE_URL)" -o bridge/pedalboard-bridge
+	chmod +x bridge/pedalboard-bridge
 
 # No make install — files are placed via debian/pedalboard-os.install.
 override_dh_auto_install:

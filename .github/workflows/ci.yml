@@ -10,8 +10,11 @@ permissions:
 
 jobs:
   build-deb:
-    runs-on: ubuntu-latest
-    container: debian:bookworm
+    runs-on: ubuntu-24.04-arm
+    container:
+      image: debian:bookworm
+      env:
+        HOME: /root
     steps:
       - uses: actions/checkout@v4
 
@@ -19,7 +22,7 @@ jobs:
         run: |
           apt-get update -qq
           apt-get install -y --no-install-recommends \
-            build-essential debhelper devscripts dpkg-dev
+            build-essential debhelper devscripts dpkg-dev curl ca-certificates
 
       - name: Build .deb
         run: dpkg-buildpackage -us -uc -b

@@ -1,2 +1,5 @@
 images/
 .kiro
+
+# fetched during deb build
+bridge/
