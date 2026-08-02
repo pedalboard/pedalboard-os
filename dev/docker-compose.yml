@@ -15,6 +15,24 @@ services:
       - sim-bin:/opt/sim-bin
       - pedalboard-data:/home/pedalboard/.pedalboards
 
+  # Systemd-enabled container for testing gig/dev mode switching.
+  pedalboard-systemd:
+    build:
+      context: ..
+      dockerfile: dev/Dockerfile.systemd
+    profiles: ["systemd"]
+    ports:
+      - "8081:8080"  # Bridge
+      - "8889:8888"  # MOD UI
+    privileged: true
+    cgroup: host
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - ../../pedalboard-bridge/pedalboard-bridge:/usr/local/bin/pedalboard-bridge
+
   # Builds the simulator binary for the container's glibc (first run only)
   sim-build:
     image: rust:bookworm
