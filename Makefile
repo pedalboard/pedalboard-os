@@ -8,7 +8,7 @@ CONFIG_DIR = /etc/pedalboard
 GITHUB_ORG     = pedalboard
 OS_REPO        = pedalboard-os
 BRIDGE_REPO    = pedalboard-bridge
-BRIDGE_BINARY  = /udata/pedalboard-bridge/pedalboard-bridge-rust
+BRIDGE_BINARY  = /usr/bin/pedalboard-bridge
 
 # ─── CM5 targets ───
 
