@@ -1,0 +1,32 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    purge)
+        # Remove runtime data directory.
+        rm -rf /var/lib/pedalboard
+
+        # Remove pedalboard system user and group.
+        if getent passwd pedalboard > /dev/null 2>&1; then
+            deluser --system pedalboard || true
+        fi
+        if getent group pedalboard > /dev/null 2>&1; then
+            delgroup --system pedalboard || true
+        fi
+
+        systemctl daemon-reload || true
+        ;;
+
+    remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+        systemctl daemon-reload || true
+        ;;
+
+    *)
+        echo "postrm called with unknown argument '$1'" >&2
+        exit 1
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0

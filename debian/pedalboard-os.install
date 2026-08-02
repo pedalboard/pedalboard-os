@@ -1,0 +1,17 @@
+services/pedalboard-jack.service         lib/systemd/system/
+services/pedalboard-modhost.service      lib/systemd/system/
+services/pedalboard-modui.service        lib/systemd/system/
+services/pedalboard-bridge.service       lib/systemd/system/
+services/pedalboard-gig.target           lib/systemd/system/
+services/pedalboard-dev.target           lib/systemd/system/
+services/pedalboard-bridge.service.d/nologin-cleanup.conf   lib/systemd/system/pedalboard-bridge.service.d/
+udev/90-pedalboard-midi.rules            lib/udev/rules.d/
+services/env                             etc/pedalboard/
+services/mod-hardware-descriptor.json   etc/pedalboard/
+audio/audio-patches.json                etc/pedalboard/
+audio/models/tw40_blues_deluxe_deerinkstudios.json      etc/pedalboard/models/
+audio/models/tw40_blues_solo_deerinkstudios.json        etc/pedalboard/models/
+audio/models/tw40_british_lead_deerinkstudios.json      etc/pedalboard/models/
+audio/models/tw40_british_rhythm_deerinkstudios.json    etc/pedalboard/models/
+audio/models/tw40_california_clean_deerinkstudios.json  etc/pedalboard/models/
+audio/models/tw40_california_crunch_deerinkstudios.json etc/pedalboard/models/

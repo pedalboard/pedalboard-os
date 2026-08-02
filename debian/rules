@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+# No build step — this is a data-only package.
+override_dh_auto_build:
+
+# No make install — files are placed via debian/pedalboard-os.install.
+override_dh_auto_install:

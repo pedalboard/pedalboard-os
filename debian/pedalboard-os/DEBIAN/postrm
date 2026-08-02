@@ -1,0 +1,44 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    purge)
+        # Remove runtime data directory.
+        rm -rf /var/lib/pedalboard
+
+        # Remove pedalboard system user and group.
+        if getent passwd pedalboard > /dev/null 2>&1; then
+            deluser --system pedalboard || true
+        fi
+        if getent group pedalboard > /dev/null 2>&1; then
+            delgroup --system pedalboard || true
+        fi
+
+        systemctl daemon-reload || true
+        ;;
+
+    remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+        systemctl daemon-reload || true
+        ;;
+
+    *)
+        echo "postrm called with unknown argument '$1'" >&2
+        exit 1
+        ;;
+esac
+
+# Automatically added by dh_installsystemd/13.11.4
+if [ "$1" = remove ] && [ -d /run/systemd/system ] ; then
+	systemctl --system daemon-reload >/dev/null || true
+fi
+# End automatically added section
+# Automatically added by dh_installsystemd/13.11.4
+if [ "$1" = "purge" ]; then
+	if [ -x "/usr/bin/deb-systemd-helper" ]; then
+		deb-systemd-helper purge 'pedalboard-bridge.service' 'pedalboard-jack.service' 'pedalboard-modhost.service' 'pedalboard-modui.service' >/dev/null || true
+	fi
+fi
+# End automatically added section
+
+
+exit 0

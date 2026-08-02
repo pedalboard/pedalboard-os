@@ -1,0 +1,9 @@
+pedalboard-os (1.0.0) stable; urgency=medium
+
+  * Initial release.
+  * Systemd service units for JACK, mod-host, bridge, MOD UI.
+  * Gig mode (pedalboard-gig.target) and studio mode (pedalboard-dev.target).
+  * Udev rules for MIDI device auto-connect.
+  * Audio configuration and AIDA-X model files.
+
+ -- Christof Laenzlinger <christof@laenzlinger.ch>  Sun, 02 Aug 2026 00:00:00 +0000

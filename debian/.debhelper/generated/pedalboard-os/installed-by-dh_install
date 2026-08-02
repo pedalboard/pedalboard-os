@@ -1,0 +1,17 @@
+./services/pedalboard-jack.service
+./services/pedalboard-modhost.service
+./services/pedalboard-modui.service
+./services/pedalboard-bridge.service
+./services/pedalboard-gig.target
+./services/pedalboard-dev.target
+./services/pedalboard-bridge.service.d/nologin-cleanup.conf
+./udev/90-pedalboard-midi.rules
+./services/env
+./services/mod-hardware-descriptor.json
+./audio/audio-patches.json
+./audio/models/tw40_blues_deluxe_deerinkstudios.json
+./audio/models/tw40_blues_solo_deerinkstudios.json
+./audio/models/tw40_british_lead_deerinkstudios.json
+./audio/models/tw40_british_rhythm_deerinkstudios.json
+./audio/models/tw40_california_clean_deerinkstudios.json
+./audio/models/tw40_california_crunch_deerinkstudios.json
