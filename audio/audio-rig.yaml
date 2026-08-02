@@ -1,0 +1,114 @@
+# Example: Audio-enabled setlist with neural amp modeling.
+# Demonstrates the full rig loaded at boot with snapshot-based tone switching.
+#
+# Rig: distortion boost + 3 AIDA-X amp instances (parallel, bypassed) + reverb + delay
+# Switching: instant via bypass/param changes (no plugin reload)
+# Expression: per-snapshot assignment (like Helix/Kemper)
+
+audio:
+  plugins:
+    - id: 0
+      uri: "http://guitarix.sourceforge.net/plugins/gx_mxrdist_#_mxrdist_"
+    - id: 1
+      uri: "http://aidadsp.cc/plugins/aidadsp-bundle/rt-neural-loader"
+      model: "/etc/pedalboard/models/tw40_california_clean_deerinkstudios.json"
+    - id: 2
+      uri: "http://aidadsp.cc/plugins/aidadsp-bundle/rt-neural-loader"
+      model: "/etc/pedalboard/models/tw40_british_rhythm_deerinkstudios.json"
+    - id: 3
+      uri: "http://aidadsp.cc/plugins/aidadsp-bundle/rt-neural-loader"
+      model: "/etc/pedalboard/models/tw40_blues_deluxe_deerinkstudios.json"
+    - id: 4
+      uri: "http://calf.sourceforge.net/plugins/Reverb"
+    - id: 5
+      uri: "http://calf.sourceforge.net/plugins/VintageDelay"
+  connections:
+    # Guitar in → distortion pedal
+    - ["system:capture_2", "effect_0:in"]
+    # Distortion → all amp instances (parallel)
+    - ["effect_0:out", "effect_1:lv2_audio_in_1"]
+    - ["effect_0:out", "effect_2:lv2_audio_in_1"]
+    - ["effect_0:out", "effect_3:lv2_audio_in_1"]
+    # Amp outputs → reverb (only active one passes audio)
+    - ["effect_1:lv2_audio_out_1", "effect_4:in_l"]
+    - ["effect_2:lv2_audio_out_1", "effect_4:in_l"]
+    - ["effect_3:lv2_audio_out_1", "effect_4:in_l"]
+    # Reverb → delay → output
+    - ["effect_4:out_l", "effect_5:in_l"]
+    - ["effect_5:out_l", "system:playback_2"]
+  # Physical pedal → CC mapping (which CC number each pedal sends)
+  expression:
+    - { name: "Exp1", cc: 7 }
+    - { name: "Exp2", cc: 11 }
+  snapshots:
+    - name: "Clean"
+      state:
+        "0": { bypassed: true }
+        "1": { bypassed: false, params: { PREGAIN: 0.3, MASTER: 0.8 } }
+        "2": { bypassed: true }
+        "3": { bypassed: true }
+        "4": { bypassed: false, params: { decay_time: 2.5 } }
+        "5": { bypassed: true }
+      expression:
+        Exp1: { instance: 1, param: "MASTER", min: 0.0, max: 1.0 }
+        Exp2: { instance: 4, param: "decay_time", min: 0.5, max: 5.0 }
+    - name: "Crunch"
+      state:
+        "0": { bypassed: true }
+        "1": { bypassed: true }
+        "2": { bypassed: false, params: { PREGAIN: 0.7, MASTER: 0.6 } }
+        "3": { bypassed: true }
+        "4": { bypassed: true }
+        "5": { bypassed: false, params: { time_l: 4.0, feedback: 0.3 } }
+      expression:
+        Exp1: { instance: 2, param: "MASTER", min: 0.0, max: 1.0 }
+        Exp2: { instance: 5, param: "feedback", min: 0.0, max: 0.8 }
+    - name: "Lead"
+      state:
+        "0": { bypassed: false, params: { DRIVE: 0.6, VOLUME: 0.7 } }
+        "1": { bypassed: true }
+        "2": { bypassed: true }
+        "3": { bypassed: false, params: { PREGAIN: 1.0, MASTER: 0.5 } }
+        "4": { bypassed: false, params: { decay_time: 3.0 } }
+        "5": { bypassed: false, params: { time_l: 5.0, feedback: 0.5 } }
+      expression:
+        Exp1: { instance: 3, param: "PREGAIN", min: 0.5, max: 1.0 }
+        Exp2: { instance: 0, param: "DRIVE", min: 0.0, max: 1.0 }
+
+global:
+  din_enabled: true
+  midi_clock: true
+  bpm: 120
+
+presets:
+  - name: "Ballad"
+    audio_snapshot: "Clean"
+    buttons:
+      A: { label: "Clean", audio_snapshot: "Clean", color: green }
+      B: { label: "Crunch", audio_snapshot: "Crunch", color: yellow }
+      C: { label: "Lead", audio_snapshot: "Lead", color: red }
+      D: { label: "Reverb", cc: 80, toggle: true, color: blue }
+      E: { label: "Delay", cc: 81, toggle: true, color: cyan }
+      F: { label: "Boost", cc: 82, color: white, on_long_press: next_preset }
+    encoders:
+      Vol: { label: "Volume", cc: 7 }
+      Gain: { label: "Drive", cc: 91 }
+    analog:
+      Exp1: { label: "Volume", cc: 7 }
+      Exp2: { label: "Reverb", cc: 11 }
+
+  - name: "Rock"
+    audio_snapshot: "Crunch"
+    buttons:
+      A: { label: "Riff", audio_snapshot: "Crunch", color: yellow }
+      B: { label: "Solo", audio_snapshot: "Lead", color: red }
+      C: { label: "Clean", audio_snapshot: "Clean", color: green }
+      D: { label: "FX", cc: 80, toggle: true, color: blue }
+      E: { label: "", color: off }
+      F: { label: "Next", cc: 99, color: magenta, on_long_press: next_preset }
+    encoders:
+      Vol: { label: "Volume", cc: 7 }
+      Gain: { label: "Gain", cc: 91 }
+    analog:
+      Exp1: { label: "Gain", cc: 7 }
+      Exp2: { label: "Drive", cc: 11 }
