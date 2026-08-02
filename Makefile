@@ -54,6 +54,8 @@ install: ## Install services and configuration
 	sed 's/User=laenzi/User=$(USER)/' services/pedalboard-bridge.service | sudo tee /etc/systemd/system/pedalboard-bridge.service >/dev/null
 	sudo cp services/pedalboard-gig.target /etc/systemd/system/pedalboard-gig.target
 	sudo cp services/pedalboard-dev.target /etc/systemd/system/pedalboard-dev.target
+	sudo mkdir -p /etc/systemd/system/pedalboard-bridge.service.d
+	sudo cp services/pedalboard-bridge.service.d/nologin-cleanup.conf /etc/systemd/system/pedalboard-bridge.service.d/nologin-cleanup.conf
 	sudo cp udev/90-pedalboard-midi.rules /etc/udev/rules.d/
 	-sudo udevadm control --reload-rules
 	sudo mkdir -p $(CONFIG_DIR)/models
