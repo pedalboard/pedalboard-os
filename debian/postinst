@@ -10,6 +10,10 @@ case "$1" in
         if ! getent group "$PEDALBOARD_GROUP" > /dev/null 2>&1; then
             addgroup --system "$PEDALBOARD_GROUP"
         fi
+
+        # Create runtime data directory before adding user (adduser checks it exists).
+        install -d -m 750 /var/lib/pedalboard
+
         if ! getent passwd "$PEDALBOARD_USER" > /dev/null 2>&1; then
             adduser --system --ingroup "$PEDALBOARD_GROUP" \
                 --home /var/lib/pedalboard \
@@ -23,9 +27,8 @@ case "$1" in
             usermod -aG audio "$PEDALBOARD_USER"
         fi
 
-        # Create runtime data directory.
-        install -d -o "$PEDALBOARD_USER" -g "$PEDALBOARD_GROUP" -m 750 \
-            /var/lib/pedalboard
+        # Fix ownership of runtime data directory now that user exists.
+        chown "$PEDALBOARD_USER:$PEDALBOARD_GROUP" /var/lib/pedalboard
 
         # Install MOD UI favorites if MOD UI is present and not already configured.
         if [ -d /opt/mod-ui/data ]; then
@@ -53,7 +56,7 @@ case "$1" in
         udevadm control --reload-rules || true
         udevadm trigger --subsystem-match=usb || true
 
-        # Enable services (but don't start — let the user do that).
+        # Enable services (but not targets — targets can't be enabled).
         systemctl enable pedalboard-jack.service || true
         systemctl enable pedalboard-modhost.service || true
         systemctl enable pedalboard-bridge.service || true
