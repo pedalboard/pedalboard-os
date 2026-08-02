@@ -7,8 +7,6 @@ Type=simple
 User=laenzi
 EnvironmentFile=/etc/pedalboard/env
 Environment=JACK_NO_AUDIO_RESERVATION=1
-# Pin JACK to cores 2+3 — leaves cores 0+1 for OS/IRQ handling.
-CPUAffinity=2 3
 ExecStartPre=-/bin/sh -c '/usr/bin/amixer -c $AUDIO_CARD set "Auto Mute" off'
 ExecStartPre=-/bin/sh -c '/usr/bin/amixer -c $AUDIO_CARD set "Auto Mute Mono" off'
 ExecStart=/bin/sh -c 'exec /usr/bin/jackd -d alsa -d hw:$AUDIO_CARD -r 48000 -p 64 -n 2 -i 2 -o 2 -X seq'

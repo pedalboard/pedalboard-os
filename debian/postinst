@@ -61,6 +61,15 @@ case "$1" in
         systemctl enable pedalboard-modhost.service || true
         systemctl enable pedalboard-bridge.service || true
         systemctl enable pedalboard-modui.service || true
+
+        # Restart services to pick up any changes (group membership, config).
+        if systemctl is-active pedalboard-jack.service > /dev/null 2>&1; then
+            systemctl restart pedalboard-jack.service || true
+            sleep 2
+            systemctl restart pedalboard-modhost.service || true
+            sleep 1
+            systemctl restart pedalboard-bridge.service || true
+        fi
         ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
