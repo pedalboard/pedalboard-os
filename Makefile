@@ -60,7 +60,7 @@ uninstall: ## Remove services and configuration
 deploy: ## Download and install latest release (OS config + bridge binary)
 	@echo "Deploying latest pedalboard release..."
 	@# Download and install latest pedalboard-os.deb
-	@DEB_URL=$$(curl -sf "https://api.github.com/repos/$(GITHUB_ORG)/$(OS_REPO)/releases/latest" \
+	@DEB_URL=$$(curl -sf "https://api.github.com/repos/$(GITHUB_ORG)/$(OS_REPO)/releases/tags/latest" \
 		| grep -o '"browser_download_url": *"[^"]*\.deb"' \
 		| grep -o 'https://[^"]*') && \
 	if [ -z "$$DEB_URL" ]; then \
@@ -71,7 +71,7 @@ deploy: ## Download and install latest release (OS config + bridge binary)
 	sudo dpkg -i /tmp/pedalboard-os.deb && \
 	rm -f /tmp/pedalboard-os.deb
 	@# Download and install latest bridge binary
-	@BIN_URL=$$(curl -sf "https://api.github.com/repos/$(GITHUB_ORG)/$(BRIDGE_REPO)/releases/latest" \
+	@BIN_URL=$$(curl -sf "https://api.github.com/repos/$(GITHUB_ORG)/$(BRIDGE_REPO)/releases/tags/latest" \
 		| grep -o '"browser_download_url": *"[^"]*pedalboard-bridge-arm64[^"]*"' \
 		| grep -o 'https://[^"]*') && \
 	if [ -z "$$BIN_URL" ]; then \
