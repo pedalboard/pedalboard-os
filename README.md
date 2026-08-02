@@ -40,7 +40,7 @@ sudo reboot
 ## Updating
 
 ```bash
-cd ~/pedalboard-os && git pull && make deploy
+cd ~/projects/pedalboard-os && git pull && make deploy
 ```
 
 One command — downloads the latest release of both the OS config and bridge binary,
