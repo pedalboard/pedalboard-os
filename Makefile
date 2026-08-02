@@ -51,39 +51,10 @@ deps: ## Install all audio dependencies (JACK, mod-host, plugins, AIDA-X)
 		done && rm -rf /tmp/mod-lv2-data
 	@echo "All dependencies installed."
 
-install: ## Install services and configuration
-	@echo "Installing pedalboard services for user $(USER)..."
-	sed 's/User=laenzi/User=$(USER)/' services/pedalboard-jack.service | sudo tee /etc/systemd/system/pedalboard-jack.service >/dev/null
-	sed 's/User=laenzi/User=$(USER)/' services/pedalboard-modhost.service | sudo tee /etc/systemd/system/pedalboard-modhost.service >/dev/null
-	sed 's/User=laenzi/User=$(USER)/' services/pedalboard-modui.service | sudo tee /etc/systemd/system/pedalboard-modui.service >/dev/null
-	sed 's/User=laenzi/User=$(USER)/' services/pedalboard-bridge.service | sudo tee /etc/systemd/system/pedalboard-bridge.service >/dev/null
-	sudo cp services/pedalboard-gig.target /etc/systemd/system/pedalboard-gig.target
-	sudo cp services/pedalboard-dev.target /etc/systemd/system/pedalboard-dev.target
-	sudo mkdir -p /etc/systemd/system/pedalboard-bridge.service.d
-	sudo cp services/pedalboard-bridge.service.d/nologin-cleanup.conf /etc/systemd/system/pedalboard-bridge.service.d/nologin-cleanup.conf
-	sudo cp udev/90-pedalboard-midi.rules /etc/udev/rules.d/
-	-sudo udevadm control --reload-rules
-	sudo mkdir -p $(CONFIG_DIR)/models
-	sudo cp services/env $(CONFIG_DIR)/env
-	sudo cp services/mod-hardware-descriptor.json /etc/mod-hardware-descriptor.json
-	sudo cp audio/models/*.json $(CONFIG_DIR)/models/
-	@if [ -d /opt/mod-ui/data ]; then \
-		if [ ! -f /opt/mod-ui/data/favorites.json ] || [ "$$(cat /opt/mod-ui/data/favorites.json)" = "[]" ]; then \
-			sudo cp audio/mod-favorites.json /opt/mod-ui/data/favorites.json; \
-		fi; \
-	fi
-	@if [ ! -f $(CONFIG_DIR)/audio-patches.json ]; then \
-		sudo cp audio/audio-patches.json $(CONFIG_DIR)/audio-patches.json; \
-	else \
-		echo "$(CONFIG_DIR)/audio-patches.json already exists, skipping"; \
-	fi
-	-sudo systemctl daemon-reload
-	@echo "Done. Run 'make enable' to start on boot."
+install: deploy ## Install services and configuration (alias for deploy)
 
-uninstall: disable ## Remove services and configuration
-	sudo rm -f /etc/systemd/system/pedalboard-jack.service
-	sudo rm -f /etc/systemd/system/pedalboard-bridge.service
-	-sudo systemctl daemon-reload
+uninstall: ## Remove services and configuration
+	sudo dpkg -r pedalboard-os || true
 	@echo "Services removed. Config left in $(CONFIG_DIR)."
 
 deploy: ## Download and install latest release (OS config + bridge binary)
