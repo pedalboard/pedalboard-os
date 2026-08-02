@@ -58,7 +58,7 @@ uninstall: ## Remove services and configuration
 deploy: ## Download and install latest release
 	@echo "Deploying latest pedalboard release..."
 	@DEB_URL=$$(curl -sf "https://api.github.com/repos/$(GITHUB_ORG)/$(OS_REPO)/releases/tags/latest" \
-		| grep -o '"browser_download_url": *"[^"]*\.deb"' \
+		| grep -o '"browser_download_url": *"[^"]*_arm64\.deb"' \
 		| grep -o 'https://[^"]*') && \
 	if [ -z "$$DEB_URL" ]; then \
 		echo "Error: could not find .deb in latest release of $(OS_REPO)" >&2; exit 1; \
