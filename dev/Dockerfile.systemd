@@ -1,0 +1,81 @@
+FROM debian:bookworm-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV container=docker
+
+# Install systemd and remove unnecessary units that cause issues in containers.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    systemd systemd-sysv dbus \
+    && rm -rf /var/lib/apt/lists/* \
+    && (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ "$i" = "systemd-tmpfiles-setup.service" ] || rm -f "$i"; done) \
+    && rm -f /lib/systemd/system/multi-user.target.wants/* \
+    && rm -f /etc/systemd/system/*.wants/* \
+    && rm -f /lib/systemd/system/local-fs.target.wants/* \
+    && rm -f /lib/systemd/system/sockets.target.wants/*udev* \
+    && rm -f /lib/systemd/system/sockets.target.wants/*initctl* \
+    && rm -f /lib/systemd/system/basic.target.wants/* \
+    && rm -f /lib/systemd/system/anaconda.target.wants/*
+
+# Install audio and build dependencies.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential cmake git \
+    libasound2-dev \
+    sudo curl \
+    jackd2 libjack-jackd2-dev jack-tools sox \
+    openssh-server avahi-daemon cron \
+    udev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create pedalboard user with sudo and audio group.
+RUN useradd -m -G audio -s /bin/bash pedalboard \
+    && echo "pedalboard ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/pedalboard
+
+WORKDIR /opt/pedalboard-os
+COPY . .
+
+# Install dependencies (mod-host, plugins, MOD UI).
+RUN echo "jackd2 jackd/tweak_rt_limits boolean true" | debconf-set-selections
+RUN make deps
+RUN make curate
+
+# Install pedalboard systemd services (including targets).
+RUN USER=pedalboard make install
+
+# Set default target to dev mode.
+RUN systemctl set-default pedalboard-dev.target
+
+# Enable the pedalboard services so targets can pull them in.
+RUN systemctl enable pedalboard-jack.service \
+    && systemctl enable pedalboard-modhost.service \
+    && systemctl enable pedalboard-bridge.service \
+    && systemctl enable pedalboard-modui.service
+
+# Enable auxiliary services that dev target wants.
+RUN systemctl enable ssh.service || true \
+    && systemctl enable avahi-daemon.service || true \
+    && systemctl enable cron.service || true
+
+# Fix MOD UI data permissions.
+RUN mkdir -p /opt/mod-ui/data && chown -R pedalboard:pedalboard /opt/mod-ui/data
+RUN mkdir -p /home/pedalboard/.pedalboards && chown -R pedalboard:pedalboard /home/pedalboard/.pedalboards
+COPY audio/mod-favorites.json /opt/mod-ui/data/favorites.json
+RUN chown pedalboard:pedalboard /opt/mod-ui/data/favorites.json
+
+# Generate test audio signal.
+RUN mkdir -p /opt/pedalboard-os/tests && \
+    sox -n -r 48000 -c 1 -b 32 -e floating-point /opt/pedalboard-os/tests/sine-440hz.wav \
+    synth 1 sine 440
+
+COPY tests/ /opt/pedalboard-os/tests/
+RUN chmod +x /opt/pedalboard-os/tests/*.sh 2>/dev/null || true
+
+# Override JACK service to use dummy driver in container.
+RUN mkdir -p /etc/systemd/system/pedalboard-jack.service.d && \
+    printf '[Service]\nExecStart=\nExecStart=/usr/bin/jackd -d dummy -r 48000 -p 256\nExecStartPre=\nExecStartPost=\n' \
+    > /etc/systemd/system/pedalboard-jack.service.d/docker-override.conf
+
+EXPOSE 8080 8888 3001
+
+STOPSIGNAL SIGRTMIN+3
+VOLUME ["/sys/fs/cgroup", "/tmp", "/run"]
+CMD ["/lib/systemd/systemd"]
